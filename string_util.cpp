@@ -68,7 +68,7 @@ std::vector<std::string> get_files(const char *file_prefix) {
 
     // Check if folder can be opened
     if (dp == NULL) {
-        printf("Opendir function fails %s", path);
+        printf("Opendir function fails %s", path.c_str());
         exit(1);
     }
 
@@ -95,7 +95,7 @@ std::vector<std::string> get_files(const char *file_prefix) {
     closedir(dp);
 
     if (cpt == 0) {
-        printf("No files found matching %s %s\n", path, name);
+        printf("No files found matching %s %s\n", path.c_str(), name.c_str());
         exit(1);
     }
 

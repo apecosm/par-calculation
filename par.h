@@ -8,7 +8,7 @@
 
 
 void init_zrgb(void);
-void compute_par_c(void);
+ma3f compute_par_c(void);
 
 // Dimnsion: CHL concentration; R/G/B
 ma2f zrgb(boost::extents[NROWS][NCOLS]);

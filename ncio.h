@@ -10,4 +10,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0);
 void read_var(ma2f &var, const char *filename, const char *varname, size_t i0);
 size_t get_ntime_file(const char *filename);
 
+extern const char *output_prefix;
+extern const char *output_var;
+
 #endif

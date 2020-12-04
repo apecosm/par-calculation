@@ -3,6 +3,7 @@
 
 #include "boost_def.h"
 
+/*
 #define LON_MPI 1
 #define LAT_MPI 1
 #define NX 32
@@ -11,6 +12,15 @@
 #define NTIME 73
 
 #define TIMEDIMENSION "time_counter"
+#define VVL
+*/
+extern size_t LON_MPI;
+extern size_t LAT_MPI;
+extern size_t NX;
+extern size_t NY;
+extern size_t NZ;
+extern size_t NTIME;
+extern const char *TIMEDIMENSION;
 
 // Macros to recover MPI sub-domain
 #define get_istart(p) (istart[(int) (p % LON_MPI)])

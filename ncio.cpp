@@ -1,66 +1,85 @@
+#include "ncio.h"
+#include "boost_def.h"
+#include "netcdf.h"
+#include "string_util.h"
+#include "variables.h"
 #include <dirent.h>
+#include <mpi.h>
 #include <regex>
 #include <vector>
-#include <mpi.h>
-#include "string_util.h"
-#include "netcdf.h"
-#include "boost_def.h"
-#include "variables.h"
-#include "ncio.h"
 
 size_t get_ntime_file(const char *filename) {
-    
+
     int ncid;
     int status;
     int dimid;
     size_t nsteps;
+    
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+    
     status = nc_inq_dimid(ncid, TIMEDIMENSION, &dimid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+    
     status = nc_inq_dimlen(ncid, dimid, &nsteps);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
+    status = nc_close(ncid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
+    return nsteps;
 }
 
-void read_var(ma3f &var, const char *filename, const char *varname, size_t i0) { 
-    
+void read_var(ma3f &var, const char *filename, const char *varname, size_t i0) {
+
     int status;
     int ncid;
     int varid;
-    
+
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
-    
-    var.resize(boost::extents[NZ][ny][nx]);
-    
+
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-    
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
     status = nc_open(filename, NC_NOWRITE, &ncid);
-    status = nc_inq_varid(ncid, varname, &varid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
     
+    status = nc_inq_varid(ncid, varname, &varid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
     size_t count[] = {1, NZ, ny, nx};
     size_t start[] = {i0, 0, get_jstart(mpiRank), get_istart(mpiRank)};
 
-    if (mpiRank == 0) {
-        printf("count = %d, %d, %ld, %ld\n", 1, NZ, ny, nx);
-        printf("start = %ld, %d, %ld, %ld\n", i0, 0, get_jstart(mpiRank), get_istart(mpiRank));
-    }
-
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
-
-    if (mpiRank == 0) {
-        for (int k = 0; k < 1; k++) {
-            for (int j = 0; j < ny; j++) {
-                for (int i = 0; i < nx; i++) {
-                    printf("k=%d, j=%d, i=%d, var=%f\n", k, j, i, var[k][j][i]);
-                }
-            }
-        }
+    if (status != NC_NOERR) {
+        nc_strerror(status);
     }
+
+    printf("%s: reading %s, step=%ld\n", varname, filename, i0);
 
     status = nc_close(ncid);
-    
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
 }
 
-void read_var(ma2f &var, const char *filename, const char *varname, size_t i0) { 
-    
+void read_var(ma2f &var, const char *filename, const char *varname, size_t i0) {
+
     int status;
     int ncid;
     int varid;
@@ -68,15 +87,95 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0) {
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
 
-    var.resize(boost::extents[ny][nx]);
-
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-    status = nc_inq_varid(ncid, varname, &varid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
     
+    status = nc_inq_varid(ncid, varname, &varid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
     size_t start[] = {i0, get_jstart(mpiRank), get_istart(mpiRank)};
     size_t count[] = {1, ny, nx};
-    
+
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+    
+    status = nc_close(ncid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
+    printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+    
+}
+
+void define_output_file(int cpt) {
+
+    char ncfile[1096];
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
+
+    int status;
+    int ncid;
+    int timeid;
+    int yd, xd, zd;
+    int output_ids[4];
+    
+    int nx = get_nx(mpiRank);
+    int ny = get_ny(mpiRank);
+
+    status = nc_create_par(ncfile, NC_NETCDF4 | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+
+    status = nc_def_dim(ncid, "time", NC_UNLIMITED, &timeid);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
+    status = nc_def_dim(ncid, "z", NZ, &zd);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
+    status = nc_def_dim(ncid, "y", ny, &yd);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+
+    status = nc_def_dim(ncid, "x", nx, &xd);
+    if (status != NC_NOERR) {
+        nc_strerror(status);
+    }
+    
+    output_ids[0] = timeid;
+    output_ids[1] = zd;
+    output_ids[2] = yd;
+    output_ids[3] = yd;
+    int varid;
+    
+    status = nc_def_var(ncid, output_var, NC_FLOAT, 4, output_ids, &varid); 
     status = nc_close(ncid);
     
+}
+
+void write_step(int cpt, int step, ma3f var) {
+
+    int ncid, varid, status;
+
+    char ncfile[1096];
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
+
+    size_t nx = get_nx(mpiRank);
+    size_t ny = get_ny(mpiRank);
+
+    size_t start[] = {(size_t)step, 0, get_jstart(mpiRank), get_istart(mpiRank)};
+    size_t count[] = {1, NZ, ny, nx};
+
+    status = nc_open_par(ncfile, NC_WRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    status = nc_inq_varid(ncid, output_var, &varid);
+    status = nc_var_par_access(ncid, varid, NC_COLLECTIVE);
+    status = nc_put_vara_float(ncid, varid, start, count, var.data());
 }

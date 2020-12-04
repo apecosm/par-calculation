@@ -67,9 +67,8 @@ void init_zrgb(void) {
     zrgb[0][60] = 10.000, zrgb[1][60] = 0.47804, zrgb[2][60] = 0.27178, zrgb[3][60] = 0.56870;
 }
 
-void compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
+ma3f compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
 
-    int nOceanCell = 100, NLEVEL_OPA = 75;
     int nx = get_nx(mpiRank);
     int ny = get_ny(mpiRank);
 
@@ -129,6 +128,6 @@ void compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
         }
     }
 
-    return;
+    return output;
 
 }

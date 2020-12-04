@@ -6,7 +6,7 @@ OBJS = $(SRC:.cpp=.o)
 
 all: bin
 
-bin: 
+bin:  
 	$(MAKE) $(EXENAME)
 
 $(EXENAME): $(OBJS)

@@ -3,12 +3,14 @@
 
 #include "boost_def.h"
 
-#define LON_MPI 2
-#define LAT_MPI 2
+#define LON_MPI 1
+#define LAT_MPI 1
 #define NX 32
 #define NY 22
 #define NZ 31
 #define NTIME 73
+
+#define TIMEDIMENSION "time_counter"
 
 // Macros to recover MPI sub-domain
 #define get_istart(p) (istart[(int) (p % LON_MPI)])
@@ -19,10 +21,10 @@
 #define get_ny(p) (get_jend(p) - get_jstart(p) + 1)
 
 /** Processors index to process. */
-extern ma1i istart;
-extern ma1i iend;
-extern ma1i jstart;
-extern ma1i jend;
+extern ma1iu istart;
+extern ma1iu iend;
+extern ma1iu jstart;
+extern ma1iu jend;
 
 extern int mpiRank;
 extern int mpiSize;

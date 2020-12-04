@@ -1,6 +1,7 @@
 #include "ncio.h"
 #include "boost_def.h"
-#include "netcdf.h"
+#include <netcdf.h>
+#include <netcdf_par.h>
 #include "string_util.h"
 #include "variables.h"
 #include <dirent.h>
@@ -70,7 +71,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0) {
         printf("%s\n", nc_strerror(status));
     }
 
-    printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+    //printf("%s: reading %s, step=%ld\n", varname, filename, i0);
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
@@ -110,7 +111,7 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0) {
         printf("%s\n", nc_strerror(status));
     }
 
-    printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+    // printf("%s: reading %s, step=%ld\n", varname, filename, i0);
     
 }
 
@@ -118,8 +119,7 @@ void define_output_file(int cpt) {
 
     char ncfile[1096];
     sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
-    printf("++++++++++++++++++++++++++ %s\n", ncfile);
-
+  
     int status;
     int ncid;
     int timeid;
@@ -129,8 +129,8 @@ void define_output_file(int cpt) {
     int nx = NX;
     int ny = NY;
     int nz = NZ;
-    
-    printf("+++++++++++++++++++++++++++ mpi=%d, ny=%d, nx=%d, nz=%d\n", mpiRank, ny, nx, nz);
+
+    printf("+++++++++ mpi=%d, ny=%d, nx=%d, nz=%d\n", mpiRank, ny, nx, nz);
 
     status = nc_create_par(ncfile, NC_NETCDF4 | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
@@ -141,51 +141,55 @@ void define_output_file(int cpt) {
     if (status != NC_NOERR) {
         printf("%s\n", nc_strerror(status));
     }
+    printf("time ok\n");
 
     status = nc_def_dim(ncid, "z", nz, &zd);
     if (status != NC_NOERR) {
         printf("%s\n", nc_strerror(status));
     }
+    printf("z ok\n");
 
     status = nc_def_dim(ncid, "y", ny, &yd);
     if (status != NC_NOERR) {
         printf("%s\n", nc_strerror(status));
     }
+    printf("y ok\n");
 
     status = nc_def_dim(ncid, "x", nx, &xd);
     if (status != NC_NOERR) {
         printf("%s\n", nc_strerror(status));
     }
-     
+    printf("x ok\n");
+
     output_ids[0] = timeid;
     output_ids[1] = zd;
     output_ids[2] = yd;
-    output_ids[3] = yd;
+    output_ids[3] = xd;
     int varid;
-    
-    printf("+++++++++++++++++ file=%s, var = %s\n", ncfile, output_var);
 
+    //printf("+++++++++++++++++ file=%s, var = %s\n", ncfile, output_var);
     status = nc_def_var(ncid, output_var, NC_FLOAT, 4, output_ids, &varid);
     if (status != NC_NOERR) {
-      printf("%s\n", nc_strerror(status));
+        printf("%s\n", nc_strerror(status));
     }
-
     
-
+    /**
     status = nc_enddef(ncid); //end definitions: leave define mode
     if (status != NC_NOERR) {
         printf("%s\n", nc_strerror(status));
     }
+    */
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
       printf("%s\n", nc_strerror(status));
     }
     
+
 }
 
 void write_step(int cpt, int step, ma3f var) {
-
+    
     int ncid, varid, status;
 
     char ncfile[1096];
@@ -199,6 +203,7 @@ void write_step(int cpt, int step, ma3f var) {
 
     status = nc_open_par(ncfile, NC_WRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
+        printf("Error opening the file %s\n", ncfile);
         printf("%s\n", nc_strerror(status));
     }
     status = nc_inq_varid(ncid, output_var, &varid);
@@ -210,6 +215,11 @@ void write_step(int cpt, int step, ma3f var) {
         printf("%s\n", nc_strerror(status));
     }
     status = nc_put_vara_float(ncid, varid, start, count, var.data());
+    if (status != NC_NOERR) {
+        printf("%s\n", nc_strerror(status));
+    }
+
+    status = nc_close(ncid);
     if (status != NC_NOERR) {
         printf("%s\n", nc_strerror(status));
     }

@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <vector>
 
-size_t LON_MPI = 2;
-size_t LAT_MPI = 2;
+size_t LON_MPI = 1;
+size_t LAT_MPI = 1;
 size_t NX = 32;
 size_t NY = 22;
 size_t NZ = 31;
@@ -69,10 +69,10 @@ int main(int argc, char *argv[]) {
 #endif
 
     // count the number of read for the given file
-    size_t cptchl = 0;
     // ichl = index of the file in the list of files
-    int ichl = 0;
     // nchl = number of time steps in the file
+    size_t cptchl = 0;
+    int ichl = 0;
     size_t nchl = get_ntime_file(list_chl_files[ichl].c_str());
 
     size_t cptqsr = 0;
@@ -99,9 +99,9 @@ int main(int argc, char *argv[]) {
     ma2f qsr(boost::extents[ny][nx]);
 
     // Reading variable for mask
-    //read_var(e3t, mesh_mask, "e3t_0", 0);
+    read_var(e3t, mesh_mask, "e3t_0", 0);
 
-    for (int t = 0; t < NTIME; t++) {
+    for (int t = 0; t < 1; t++) {
 
         if (cptchl == nchl) {
             ichl++;
@@ -124,33 +124,31 @@ int main(int argc, char *argv[]) {
 #endif
 
         printf("+++++++++++++++++++++++++++++++ time = %d\n", t);
-        //read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, cptqsr);
-        //read_var(chl, list_chl_files[ichl].c_str(), chl_var, cptchl);
-        //read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, cpte3t);
-        
-        if(iout == 0) { 
+        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, cptqsr);
+        read_var(chl, list_chl_files[ichl].c_str(), chl_var, cptchl);
+#ifdef VVL
+        read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, cpte3t);
+#endif
+
+        if (iout == 0) {
             define_output_file(cptout);
         }
-        
-        /**
+
+        /*
         write_step(cptout, iout, chl);
         iout++;
-        **/
-       
-        printf("write cptout=%d, iout=%d\n", cptout, iout);
-        
-        if(iout == output_frequency) {
+
+        if (iout == output_frequency) {
             iout = 0;
             cptout++;
-        } 
-        
-        break;
+        }
 
         cptchl++;
         cptqsr++;
 #ifdef VVL
         cpte3t++;
-#endif
+#endif  
+        */
     }
 
     // read the model mesh_mask

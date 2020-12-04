@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <vector>
 
-size_t LON_MPI = 1;
-size_t LAT_MPI = 1;
+size_t LON_MPI = 2;
+size_t LAT_MPI = 2;
 size_t NX = 32;
 size_t NY = 22;
 size_t NZ = 31;
@@ -32,8 +32,8 @@ const char *e3t_pattern = "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/d
 const char *e3t_var = "votemper";
 #endif
 
-const char *output_prefix = "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_PAR";
-const char *output_var = "PAR";
+const char *output_prefix = "clim_GYRE_5d_00010101_00101231_PAR";
+const char *output_var = "par";
 int output_frequency = 73;
 
 /** Processors index to process. */
@@ -85,6 +85,9 @@ int main(int argc, char *argv[]) {
     size_t ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
 #endif
 
+    int iout = 0;
+    int cptout = 0;
+
     init_mpi_domains();
 
     int nx = get_nx(mpiRank);
@@ -96,7 +99,7 @@ int main(int argc, char *argv[]) {
     ma2f qsr(boost::extents[ny][nx]);
 
     // Reading variable for mask
-    read_var(e3t, mesh_mask, "e3t_0", 0);
+    //read_var(e3t, mesh_mask, "e3t_0", 0);
 
     for (int t = 0; t < NTIME; t++) {
 
@@ -121,9 +124,27 @@ int main(int argc, char *argv[]) {
 #endif
 
         printf("+++++++++++++++++++++++++++++++ time = %d\n", t);
-        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, cptqsr);
-        read_var(chl, list_chl_files[ichl].c_str(), chl_var, cptchl);
-        read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, cpte3t);
+        //read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, cptqsr);
+        //read_var(chl, list_chl_files[ichl].c_str(), chl_var, cptchl);
+        //read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, cpte3t);
+        
+        if(iout == 0) { 
+            define_output_file(cptout);
+        }
+        
+        /**
+        write_step(cptout, iout, chl);
+        iout++;
+        **/
+       
+        printf("write cptout=%d, iout=%d\n", cptout, iout);
+        
+        if(iout == output_frequency) {
+            iout = 0;
+            cptout++;
+        } 
+        
+        break;
 
         cptchl++;
         cptqsr++;

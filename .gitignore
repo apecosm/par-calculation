@@ -1,4 +1,7 @@
 Makefile.inc
 *.o
 *.exe
-
+*.nc
+*.sh
+*.log
+.vscode/*.json

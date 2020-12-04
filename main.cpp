@@ -76,18 +76,6 @@ int main(int argc, char *argv[]) {
     ma3f tmask(boost::extents[NZ][ny][nx]);
     read_var(tmask, mesh_mask, "tmask", 0);
 
-    /*
-    if (mpiRank == 0) {
-        for (int k = 0; k < 1; k++) {
-            for (int j = 0; j < ny; j++) {
-                for (int i = 0; i < nx; i++) {
-                // /printf("k=%d, j=%d, i=%d, mask=%f\n", k, j, i, tmask[k][j][i]);
-                }
-            }
-        }
-    }
-    */
-
     //ma3f e3t_0;
     //read_var(e3t_0, mesh_mask, "e3t_0", 0);
     //for(int t = 0; t < NTIME; t++) {

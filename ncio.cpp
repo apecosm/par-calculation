@@ -1,6 +1,7 @@
 #include <dirent.h>
 #include <regex>
 #include <vector>
+#include <mpi.h>
 #include "string_util.h"
 #include "netcdf.h"
 #include "boost_def.h"
@@ -13,7 +14,7 @@ size_t get_ntime_file(const char *filename) {
     int status;
     int dimid;
     size_t nsteps;
-    status = nc_open(filename, NC_NOWRITE, &ncid);
+    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     status = nc_inq_dimid(ncid, TIMEDIMENSION, &dimid);
     status = nc_inq_dimlen(ncid, dimid, &nsteps);
 }
@@ -28,6 +29,8 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0) {
     size_t nx = get_nx(mpiRank);
     
     var.resize(boost::extents[NZ][ny][nx]);
+    
+    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     
     status = nc_open(filename, NC_NOWRITE, &ncid);
     status = nc_inq_varid(ncid, varname, &varid);
@@ -66,8 +69,8 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0) {
     size_t nx = get_nx(mpiRank);
 
     var.resize(boost::extents[ny][nx]);
-    
-    status = nc_open(filename, NC_NOWRITE, &ncid);
+
+    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     status = nc_inq_varid(ncid, varname, &varid);
     
     size_t start[] = {i0, get_jstart(mpiRank), get_istart(mpiRank)};

@@ -28,11 +28,11 @@ BOOST = ${HOME}/Libs/Cpp/boost_1_70_0/
 INCBOOST = -I$(BOOST)
 
 ### Netcdf
-LIBNETCDF = -L/usr/lib/x86_64-linux-gnu/ -lnetcdf -lhdf5_serial_hl -lhdf5_serial -lz
+LIBNETCDF = -L/home/barrier/Libs/netcdf_par/netcdf-c-4.7.4/install/lib -lnetcdf -L/home/barrier/Libs/netcdf_par/hdf5-1.12.0/install/lib -lhdf5_serial_hl -lhdf5_serial -lz
 
 # On Datarmor, when loading the proper NetCDF module, MPI path are automatically
 # set up (cf. quickstart, page 11).
-INCNETCDF = -I/usr/include 
+INCNETCDF = -I/home/barrier/Libs/netcdf_par/netcdf-c-4.7.4/install/include -I/home/barrier/Libs/netcdf_par/hdf5-1.12.0/install/include
 
 # Optimisation flags
 OPTFLAGS = -O3 -std=c++11

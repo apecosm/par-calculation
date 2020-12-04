@@ -2,6 +2,8 @@
 #define NCIO_H
 
 #include "boost_def.h"
+#include <netcdf.h>
+#include <netcdf_par.h>
 
 void read_var(ma3b &var, const char *filename, const char *varname, size_t i0);
 void read_var(ma3f &var, const char *filename, const char *varname, size_t i0);

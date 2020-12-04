@@ -1,0 +1,56 @@
+# Linux GCC Makefile for Apecosm (trunk)
+# Nicolas Barrier
+
+###################################
+##### DEFINITION OF MAKE VAR. #####
+###################################
+
+# EDIT PATHS AND OPTIONS ------------------------------
+# MPI Compiler
+# According to PCIM documentation (datarmor_quickstart.pdf, page 14),
+# compilation should be done by using CC $MPI_LIBS instead of mpiCC
+CC =  mpicxx  # cpp compilator
+AR = ar      # linker of .o into .a
+ARFLAGS = r  # ar flag
+RM = rm       # rm alias
+RMFLAGS = -fv   # rm options 
+LINKMAIN =  mpicxx   # main linker 
+LINK =  mpicxx    # linker
+MKDIR = mkdir -p
+EXENAME = compute_par.exe
+
+###################################################
+##### EXTERNAL LIBRARIES (MPI, BOOST, NETCDF) #####
+###################################################
+
+### BOOST path
+BOOST = ${HOME}/Libs/Cpp/boost_1_70_0/
+INCBOOST = -I$(BOOST)
+
+### Netcdf
+LIBNETCDF = -L/usr/lib/x86_64-linux-gnu/ -lnetcdf -lhdf5_serial_hl -lhdf5_serial -lz
+
+# On Datarmor, when loading the proper NetCDF module, MPI path are automatically
+# set up (cf. quickstart, page 11).
+INCNETCDF = -I/usr/include 
+
+# Optimisation flags
+OPTFLAGS = -O3 -std=c++11
+
+# Warning flags
+WFLAGS = -g
+
+# compilation flags
+CPPFLAGS = $(WFLAGS) $(OPTFLAGS)
+
+# $(MPI_LIBS) automatically set up
+LIBMPI = $(MPI_LIBS)
+
+# External libraries to load
+LIBS = $(LIBNETCDF) $(LIBMPI) $(LIBBOOST)
+
+# Compilation options
+CFLAGS = $(CPPFLAGS)
+
+# Linking options
+LNFLAGS = $(CPPFLAGS)

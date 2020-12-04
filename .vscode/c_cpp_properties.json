@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**", 
+                "/home/nbarrier/Libs/Cpp/boost_1_70_0/",
+                "/usr/lib/openmpi/include/",
+                "/home/nbarrier/Libs/Cpp/alglib-3.4/trunk/"
+            ],
+            "defines": ["VVL", "NEMO_NOINTERP"],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

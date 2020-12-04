@@ -1,0 +1,28 @@
+{
+    
+    "search.exclude": {
+        "arch": true,
+        "bin": true,
+        "doxygen": true,
+        "lib": true,
+        "report": true,
+    },
+    
+    "files.exclude": {
+        "*sh": true,
+        "*Makefile*": true,
+    },
+
+    "fortran.linterEnabled": false,
+    "files.associations": {
+        "*.tcc": "cpp",
+        "Makefile.*": "makefile",
+        "iosfwd": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "__config": "cpp",
+        "cstdio": "cpp"
+    },
+    "C_Cpp.clang_format_style": " { BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All }"
+}

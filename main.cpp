@@ -9,16 +9,15 @@
 #include <stdio.h>
 #include <vector>
 
-size_t LON_MPI=1;
-size_t LAT_MPI=1;
-size_t NX=32;
-size_t NY=22;
-size_t NZ=31;
-size_t NTIME=73;
+size_t LON_MPI = 1;
+size_t LAT_MPI = 1;
+size_t NX = 32;
+size_t NY = 22;
+size_t NZ = 31;
+size_t NTIME = 73;
 
 const char *TIMEDIMENSION = "time_counter";
 #define VVL
-
 
 const char *mesh_mask = "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/mesh_mask.nc";
 

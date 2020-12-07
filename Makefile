@@ -6,13 +6,13 @@ OBJS = $(SRC:.cpp=.o)
 
 all: bin
 
-bin:  
+bin:
 	$(MAKE) $(EXENAME)
 
 $(EXENAME): $(OBJS)
 	$(LINKMAIN) $(LNFLAGS) -o $(EXENAME) $(OBJS) $(LIBS)
 
-%.o: %.cpp
+%.o: %.cpp variables.h
 	$(CC) $(CFLAGS) -I$(INC) $(INCBOOST) $(INCNETCDF) $(INCCONF) -o $@ -c $<
 
 clean:

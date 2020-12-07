@@ -3,9 +3,8 @@
 
 #include "boost_def.h"
 
-void read_var(ma3b &var, const char *filename, const char *varname, size_t i0);
-void read_var(ma3f &var, const char *filename, const char *varname, size_t i0);
-void read_var(ma2f &var, const char *filename, const char *varname, size_t i0);
+void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, float conversion=1.0);
+void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, float conversion=1.0);
 size_t get_ntime_file(const char *filename);
 void define_output_file(int cpt);
 void write_step(int cpt, int step, ma3f var);

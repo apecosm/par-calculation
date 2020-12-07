@@ -52,7 +52,7 @@ size_t get_ntime_file(const char *filename) {
 /** Reads a 3D (depth, y, x) variable from NetCDF. 
  * 
 */
-void read_var(ma3f &var, const char *filename, const char *varname, size_t i0) {
+void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, float conversion) {
 
     int status;
     int ncid;
@@ -80,6 +80,13 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0) {
     }
 
     printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+    for (size_t k = 0; k < NZ; k++) {
+        for (size_t j = 0; j < ny; j++) {
+            for (size_t i = 0; i < nx; i++) {
+                var[k][j][i] *= conversion;
+            }
+        }
+    }
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
@@ -90,7 +97,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0) {
 /** Reads a 2D (y, x) output variable. 
  * 
 */
-void read_var(ma2f &var, const char *filename, const char *varname, size_t i0) {
+void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, float conversion) {
 
     int status;
     int ncid;
@@ -115,6 +122,12 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0) {
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
         ERR(status);
+    }
+
+    for (size_t j = 0; j < ny; j++) {
+        for (size_t i = 0; i < nx; i++) {
+            var[j][i] *= conversion;
+        }
     }
 
     status = nc_close(ncid);

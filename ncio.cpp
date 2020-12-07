@@ -31,11 +31,13 @@ void read_gridvar(ma3f &var, const char *filename, const char *varname) {
 
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
+        printf("Error opening %s\n", filename);
         ERR(status);
     }
 
     status = nc_inq_varid(ncid, varname, &varid);
     if (status != NC_NOERR) {
+        printf("Error inq %s\n", varname);
         ERR(status);
     }
 
@@ -44,11 +46,13 @@ void read_gridvar(ma3f &var, const char *filename, const char *varname) {
 
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
+        printf("Error reading %s\n", varname);
         ERR(status);
     }
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
+        printf("Error closing %s\n", filename);
         ERR(status);
     }
 
@@ -325,6 +329,7 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
 
     status = nc_inq_varid(ncid, varname, &varid);
     if (status != NC_NOERR) {
+        printf("Error inq. %s\n", varname);
         ERR(status);
     }
 
@@ -333,6 +338,7 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
 
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
+        printf("Error reading %s\n", varname);
         ERR(status);
     }
 

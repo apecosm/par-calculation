@@ -74,15 +74,20 @@ int main(int argc, char *argv[]) {
     int ny = get_ny(mpiRank);
 
     // Init. the input arrays
-    ma3f tmask(boost::extents[NZ][ny][nx]);
-    ma3f e3t(boost::extents[NZ][ny][nx]);
-    ma3f chl(boost::extents[NZ][ny][nx]);
-    ma2f qsr(boost::extents[ny][nx]);
-    ma3f par(boost::extents[NZ][ny][nx]);
+    ma3d tmask(boost::extents[NZ][ny][nx]);
+    ma3d e3t(boost::extents[NZ][ny][nx]);
+    ma3d chl(boost::extents[NZ][ny][nx]);
+    ma2d qsr(boost::extents[ny][nx]);
+    ma3d par(boost::extents[NZ][ny][nx]);
+#ifdef PARFRAC
+    ma3d parfrac(boost::extents[NFRAC][ny][nx]);
+    read_parfrac(parfrac, parfrac_file, parfrac_var);
+#endif
 
     // Reading variable for e3t
     read_var(e3t, mesh_mask, "e3t_0", 0);
     read_var(tmask, mesh_mask, "tmask", 0);
+    
 
     if (mpiRank == 0)
         printf("+++++++++++++++++++++++++++++++ Starting computations\n");
@@ -115,6 +120,17 @@ int main(int argc, char *argv[]) {
         read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl, conversion_chl);
 #ifdef VVL
         read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
+#endif
+
+#ifdef PARFRAC
+        int ifrac = time % NFRAC;
+        if(mpiRank == 0) printf("ifrac = %d\n", ifrac);
+        for (int j = 0; j < ny; j++) {
+            for (int i = 0; i < nx; i++) {
+                if(tmask[0][j][i] == 0) continue;
+                qsr[j][i] *= parfrac[ifrac][j][i];
+            }
+        }
 #endif
 
         // computation of PAR.

@@ -52,7 +52,7 @@ size_t get_ntime_file(const char *filename) {
 /** Reads a 3D (depth, y, x) variable from NetCDF. 
  * 
 */
-void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, float conversion) {
+void read_var(ma3d &var, const char *filename, const char *varname, size_t i0, double conversion) {
 
     int status;
     int ncid;
@@ -74,7 +74,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, f
     size_t count[] = {1, NZ, ny, nx};
     size_t start[] = {i0, 0, get_jstart(mpiRank), get_istart(mpiRank)};
 
-    status = nc_get_vara_float(ncid, varid, start, count, var.data());
+    status = nc_get_vara_double(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
         ERR(status);
     }
@@ -97,7 +97,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, f
 /** Reads a 2D (y, x) output variable. 
  * 
 */
-void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, float conversion) {
+void read_var(ma2d &var, const char *filename, const char *varname, size_t i0, double conversion) {
 
     int status;
     int ncid;
@@ -119,7 +119,7 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, f
     size_t start[] = {i0, get_jstart(mpiRank), get_istart(mpiRank)};
     size_t count[] = {1, ny, nx};
 
-    status = nc_get_vara_float(ncid, varid, start, count, var.data());
+    status = nc_get_vara_double(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
         ERR(status);
     }
@@ -180,7 +180,7 @@ void define_output_file(int cpt) {
     int output_ids[] = {timeid, zd, yd, xd};
     int varid;
 
-    status = nc_def_var(ncid, output_var, NC_FLOAT, 4, output_ids, &varid);
+    status = nc_def_var(ncid, output_var, NC_DOUBLE, 4, output_ids, &varid);
     if (status != NC_NOERR) {
         ERR(status);
     }
@@ -204,7 +204,7 @@ void define_output_file(int cpt) {
     }
 }
 
-void write_step(int cpt, int step, ma3f var, int time) {
+void write_step(int cpt, int step, ma3d var, int time) {
 
     int ncid, varid, status;
 
@@ -236,7 +236,7 @@ void write_step(int cpt, int step, ma3f var, int time) {
         ERR(status);
     }
 
-    status = nc_put_vara_float(ncid, varid, start, count, var.data());
+    status = nc_put_vara_double(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
         ERR(status);
     }
@@ -264,4 +264,41 @@ void write_step(int cpt, int step, ma3f var, int time) {
     if (status != NC_NOERR) {
         ERR(status);
     }
+}
+
+/** Reads the entire parfrac time series on the given tile.
+*/
+void read_parfrac(ma3d &var, const char *filename, const char *varname) {
+
+    int status;
+    int ncid;
+    int varid;
+
+    size_t ny = get_ny(mpiRank);
+    size_t nx = get_nx(mpiRank);
+
+    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    status = nc_inq_varid(ncid, varname, &varid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    size_t start[] = {0, get_jstart(mpiRank), get_istart(mpiRank)};
+    size_t count[] = {NFRAC, ny, nx};
+
+    status = nc_get_vara_double(ncid, varid, start, count, var.data());
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    status = nc_close(ncid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    if(mpiRank == 0)  printf("%s: reading %s, step=[0, %d]\n", varname, filename, NFRAC - 1);
 }

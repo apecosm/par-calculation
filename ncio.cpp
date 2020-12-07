@@ -79,7 +79,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, f
         ERR(status);
     }
 
-    printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+    if(mpiRank == 0) printf("%s: reading %s, step=%ld\n", varname, filename, i0);
     for (size_t k = 0; k < NZ; k++) {
         for (size_t j = 0; j < ny; j++) {
             for (size_t i = 0; i < nx; i++) {
@@ -135,7 +135,7 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, f
         ERR(status);
     }
 
-    printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+    if(mpiRank == 0)  printf("%s: reading %s, step=%ld\n", varname, filename, i0);
 }
 
 void define_output_file(int cpt) {
@@ -214,6 +214,9 @@ void write_step(int cpt, int step, ma3f var) {
         printf("Error opening the file %s\n", ncfile);
         ERR(status);
     }
+
+    if (mpiRank == 0)
+        printf("%s: writting %s, step=%d\n", output_var, ncfile, step);
 
     status = nc_inq_varid(ncid, output_var, &varid);
     if (status != NC_NOERR) {

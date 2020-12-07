@@ -84,7 +84,10 @@ int main(int argc, char *argv[]) {
     read_var(e3t, mesh_mask, "e3t_0", 0);
     read_var(tmask, mesh_mask, "tmask", 0);
 
-    for (int t = 0; t < 1; t++) {
+    if (mpiRank == 0)
+        printf("+++++++++++++++++++++++++++++++ Starting computations\n");
+
+    for (int t = 0; t < NTIME; t++) {
 
         if (stepchl == nchl) {
             ichl++;
@@ -106,10 +109,10 @@ int main(int argc, char *argv[]) {
         }
 #endif
 
-        printf("+++++++++++++++++++++++++++++++ time = %d\n", t);
+        if(mpiRank == 0) printf("++++++ time = %d\n", t);
 
         read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr);
-        read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl);
+        read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl, conversion_chl);
 #ifdef VVL
         read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
 #endif
@@ -165,11 +168,10 @@ void init_mpi_domains(void) {
         jstart[i + 1] = jend[i] + 1;
     }
 
-    for (int i = 0; i < LON_MPI; i++) {
-        printf("++++++++++++++++ i=%d, istart=%ld, iend=%ld\n", i, istart[i], iend[i]);
-    }
-
-    for (int i = 0; i < LON_MPI; i++) {
-        printf("++++++++++++++++ j=%d, jstart=%ld, jend=%ld\n", i, jstart[i], jend[i]);
+    if (mpiRank == 0) {
+        printf("++++++++++++++++++++++++ Init MPI decomposition\n");
+        for (int i = 0; i < LON_MPI * LAT_MPI; i++) {
+            printf("++++ i=%d, istart=%ld, iend=%ld, jstart=%ld, jend=%ld\n", i, get_istart(i), get_iend(i), get_jstart(i), get_jend(i));
+        }
     }
 }

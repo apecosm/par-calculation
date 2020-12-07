@@ -185,6 +185,14 @@ void define_output_file(int cpt) {
         ERR(status);
     }
 
+    int time_ids[] = {timeid};
+    int tid;
+
+    status = nc_def_var(ncid, "time", NC_INT, 1, time_ids, &tid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
     status = nc_enddef(ncid); //end definitions: leave define mode
     if (status != NC_NOERR) {
         ERR(status);
@@ -196,7 +204,7 @@ void define_output_file(int cpt) {
     }
 }
 
-void write_step(int cpt, int step, ma3f var) {
+void write_step(int cpt, int step, ma3f var, int time) {
 
     int ncid, varid, status;
 
@@ -229,6 +237,25 @@ void write_step(int cpt, int step, ma3f var) {
     }
 
     status = nc_put_vara_float(ncid, varid, start, count, var.data());
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    int tid;
+    size_t tstart[] = {(size_t)step};
+    size_t tcount[] = {1};
+
+    status = nc_inq_varid(ncid, "time", &tid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    status = nc_var_par_access(ncid, tid, NC_COLLECTIVE);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    status = nc_put_vara_int(ncid, tid, tstart, tcount, &time);
     if (status != NC_NOERR) {
         ERR(status);
     }

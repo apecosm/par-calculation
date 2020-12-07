@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
     if (mpiRank == 0)
         printf("+++++++++++++++++++++++++++++++ Starting computations\n");
 
-    for (int t = 0; t < NTIME; t++) {
+    for (int time = 0; time < NTIME; time++) {
 
         if (stepchl == nchl) {
             ichl++;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
         }
 #endif
 
-        if(mpiRank == 0) printf("++++++ time = %d\n", t);
+        if(mpiRank == 0) printf("++++++ time = %d\n", time);
 
         read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr);
         read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl, conversion_chl);
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
             define_output_file(stepout);
         }
 
-        write_step(stepout, iout, par);
+        write_step(stepout, iout, par, time);
         iout++;
 
         if (iout == output_frequency) {

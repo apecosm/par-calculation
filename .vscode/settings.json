@@ -11,6 +11,10 @@
     "files.exclude": {
         "*sh": true,
         "*Makefile*": true,
+        "*.o": true,
+        "*.log": true,
+        "*.nc": true,
+        "*.exe": true
     },
 
     "fortran.linterEnabled": false,

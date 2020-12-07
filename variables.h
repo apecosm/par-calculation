@@ -25,6 +25,15 @@
 
 #define TIMEDIMENSION "time_counter"
 #undef VVL
+#undef PARFRAC
+
+
+#ifdef PARFRAC
+#define parfrac_file "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc"
+#define NFRAC 12
+#define parfrac_var "soshfldo"
+#endif
+
 
 #define mesh_mask "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/new_mesh_mask.nc"
 

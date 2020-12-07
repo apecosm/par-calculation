@@ -12,7 +12,7 @@ bin:
 $(EXENAME): $(OBJS)
 	$(LINKMAIN) $(LNFLAGS) -o $(EXENAME) $(OBJS) $(LIBS)
 
-%.o: %.cpp variables.h
+%.o: %.cpp variables.h Makefile.inc
 	$(CC) $(CFLAGS) -I$(INC) $(INCBOOST) $(INCNETCDF) $(INCCONF) -o $@ -c $<
 
 clean:

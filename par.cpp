@@ -133,7 +133,6 @@ void compute_par_c(ma3f &output, ma3f chl, ma2f qsr, ma3f e3t, ma3f tmask) {
                 if (tmask[k][j][i] == 0)
                     continue;
                 output[k][j][i] = (ze1[k][j][i] + ze2[k][j][i] + ze3[k][j][i]) / 3.;
-                printf("output = %f\n", output[k][j][i]);
             }
         }
     }

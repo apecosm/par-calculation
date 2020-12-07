@@ -1,13 +1,14 @@
-#include "main.h"
-#include "boost_def.h"
-#include "ncio.h"
-#include "string_util.h"
-#include "variables.h"
 #include <math.h>
 #include <mpi.h>
 #include <netcdf.h>
 #include <stdio.h>
 #include <vector>
+#include "main.h"
+#include "boost_def.h"
+#include "ncio.h"
+#include "string_util.h"
+#include "variables.h"
+#include "par.h"
 
 /** Processors index to process. */
 ma1iu istart;
@@ -34,6 +35,9 @@ int main(int argc, char *argv[]) {
         MPI_Finalize();
         exit(1);
     }
+    
+    // Init the RGB attenuation coefficients
+    init_zrgb();
 
     vector<string> list_chl_files = get_files(chl_pattern);
     vector<string> list_qsr_files = get_files(qsr_pattern);
@@ -43,25 +47,25 @@ int main(int argc, char *argv[]) {
 
     // count the number of read for the given file
     // ichl = index of the file in the list of files
-    // cptchl = time step being read in the file
+    // stepchl = time step being read in the file
     // nchl = number of time steps in the file
-    size_t cptchl = 0;
+    size_t stepchl = 0;
     int ichl = 0;
     size_t nchl = get_ntime_file(list_chl_files[ichl].c_str());
 
-    size_t cptqsr = 0;
+    size_t stepqsr = 0;
     int iqsr = 0;
     size_t nqsr = get_ntime_file(list_qsr_files[iqsr].c_str());
 
 #ifdef VVL
-    size_t cpte3t = 0;
+    size_t stepe3t = 0;
     int ie3t = 0;
     size_t ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
 #endif
 
     // iterator for the output
     int iout = 0;
-    int cptout = 0;
+    int stepout = 0;
 
     // initialisation of the MPI decomposition.
     init_mpi_domains();
@@ -74,56 +78,61 @@ int main(int argc, char *argv[]) {
     ma3f e3t(boost::extents[NZ][ny][nx]);
     ma3f chl(boost::extents[NZ][ny][nx]);
     ma2f qsr(boost::extents[ny][nx]);
+    ma3f par(boost::extents[NZ][ny][nx]);
 
     // Reading variable for e3t
     read_var(e3t, mesh_mask, "e3t_0", 0);
+    read_var(tmask, mesh_mask, "tmask", 0);
 
     for (int t = 0; t < 1; t++) {
 
-        if (cptchl == nchl) {
+        if (stepchl == nchl) {
             ichl++;
-            cptchl = 0;
+            stepchl = 0;
             nchl = get_ntime_file(list_chl_files[ichl].c_str());
         }
 
-        if (cptqsr == nqsr) {
+        if (stepqsr == nqsr) {
             iqsr++;
-            cptqsr = 0;
+            stepqsr = 0;
             nqsr = get_ntime_file(list_qsr_files[iqsr].c_str());
         }
 
 #ifdef VVL
-        if (cpte3t == ne3t) {
+        if (stepe3t == ne3t) {
             ie3t++;
-            cpte3t = 0;
+            stepe3t = 0;
             ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
         }
 #endif
 
         printf("+++++++++++++++++++++++++++++++ time = %d\n", t);
 
-        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, cptqsr);
-        read_var(chl, list_chl_files[ichl].c_str(), chl_var, cptchl);
+        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr);
+        read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl);
 #ifdef VVL
-        read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, cpte3t);
+        read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
 #endif
 
+        // computation of PAR.
+        compute_par_c(par, chl, qsr, e3t, tmask);
+
         if (iout == 0) {
-            define_output_file(cptout);
+            define_output_file(stepout);
         }
 
-        write_step(cptout, iout, chl);
+        write_step(stepout, iout, par);
         iout++;
 
         if (iout == output_frequency) {
             iout = 0;
-            cptout++;
+            stepout++;
         }
 
-        cptchl++;
-        cptqsr++;
+        stepchl++;
+        stepqsr++;
 #ifdef VVL
-        cpte3t++;
+        stepe3t++;
 #endif
     }
 

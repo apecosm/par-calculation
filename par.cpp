@@ -85,7 +85,7 @@ void compute_par_c(ma3f &output, ma3f chl, ma2f qsr, ma3f e3t, ma3f tmask) {
     // Computation of the irgb index value, obtained from CHL inputs
     // It is basically the row index
     // TODO: add the verificiation as in the p4zopt.F90
-    // ma2d irgb(boost.extents[nOceanCell][NLEVEL_OPA]);
+    // ma2f irgb(boost.extents[nOceanCell][NLEVEL_OPA]);
     for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
             for (size_t k = 0; k < NZ; k++) {

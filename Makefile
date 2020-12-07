@@ -15,7 +15,7 @@ $(EXENAME): $(OBJS)
 	$(LINKMAIN) $(LNFLAGS) -o $(EXENAME) $(OBJS) $(LIBS)
 
 %.o: %.cpp variables.h Makefile.inc
-	$(CC) $(CFLAGS) -I$(INC) $(INCBOOST) $(INCNETCDF) $(INCCONF) -o $@ -c $<
+	$(CC) $(CFLAGS) $(INCBOOST) $(INCNETCDF) $(INCCONF) -o $@ -c $<
 
 clean:
 	$(RM) $(RMFLAGS) *.o $(EXENAME)

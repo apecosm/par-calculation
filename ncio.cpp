@@ -16,6 +16,46 @@
         exit(ERRCODE);                         \
     }
 
+  
+/** Reads a 2D (y, x) output variable. 
+ * 
+*/
+void read_gridvar(ma3f &var, const char *filename, const char *varname) {
+
+    int status;
+    int ncid;
+    int varid;
+
+    size_t ny = get_ny(mpiRank);
+    size_t nx = get_nx(mpiRank);
+
+    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    status = nc_inq_varid(ncid, varname, &varid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    size_t start[] = {0, get_jstart(mpiRank), get_istart(mpiRank)};
+    size_t count[] = {NZ, ny, nx};
+
+    status = nc_get_vara_float(ncid, varid, start, count, var.data());
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    status = nc_close(ncid);
+    if (status != NC_NOERR) {
+        ERR(status);
+    }
+
+    if(mpiRank == 0)  printf("%s: reading %s\n", varname, filename);
+}
+
+
 /** Get the number of time steps stored in a NetCDF output file 
  * 
 */

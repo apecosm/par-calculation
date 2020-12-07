@@ -11,7 +11,7 @@
 #ifndef OOPE_DEFINITIONS_H
 #define OOPE_DEFINITIONS_H
 
-#include "boost/multi_array.hpp"
+#include <boost/multi_array.hpp>
 
 //////////////////
 // Type definition

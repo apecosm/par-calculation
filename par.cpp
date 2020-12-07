@@ -1,6 +1,9 @@
 #include "par.h"
 #include "variables.h"
 
+// Dimnsion: CHL concentration; R/G/B
+ma2f zrgb(boost::extents[NROWS][NCOLS]);
+
 void init_zrgb(void) {
 
     // CHL                     // Blue                     // Green                    // Red
@@ -67,13 +70,11 @@ void init_zrgb(void) {
     zrgb[0][60] = 10.000, zrgb[1][60] = 0.47804, zrgb[2][60] = 0.27178, zrgb[3][60] = 0.56870;
 }
 
-ma3f compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
+void compute_par_c(ma3f &output, ma3f chl, ma2f qsr, ma3f e3t, ma3f tmask) {
 
     int nx = get_nx(mpiRank);
     int ny = get_ny(mpiRank);
 
-    // 1 = Blue, 2=Green, 3=Red
-    ma3f output(boost::extents[NZ][ny][nx]);
     ma3f ze1(boost::extents[NZ][ny][nx]);
     ma3f ze2(boost::extents[NZ][ny][nx]);
     ma3f ze3(boost::extents[NZ][ny][nx]);
@@ -88,6 +89,8 @@ ma3f compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
     for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
             for (size_t k = 0; k < NZ; k++) {
+                if (tmask[k][j][i] == 0)
+                    continue;
                 double chltemp = chl[k][j][i];
                 chltemp = fmin(10., fmax(0.05, chltemp));
                 double irgbtmp = 41. + 20. * log10(chltemp);
@@ -103,6 +106,8 @@ ma3f compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
     // init the surface attenuation
     for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
+            if (tmask[0][j][i] == 0)
+                continue;
             ze1[0][j][i] = qsr[j][i] * exp(-0.5 * ek1[0][j][i]);
             ze2[0][j][i] = qsr[j][i] * exp(-0.5 * ek2[0][j][i]);
             ze3[0][j][i] = qsr[j][i] * exp(-0.5 * ek3[0][j][i]);
@@ -112,6 +117,8 @@ ma3f compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
     for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
             for (size_t k = 1; k < NZ; k++) {
+                if (tmask[k][j][i] == 0)
+                    continue;
                 ze1[k][j][i] = ze1[k - 1][j][i] * exp(-0.5 * (ek1[k - 1][j][i] + ek1[k][j][i]));
                 ze2[k][j][i] = ze2[k - 1][j][i] * exp(-0.5 * (ek2[k - 1][j][i] + ek2[k][j][i]));
                 ze3[k][j][i] = ze3[k - 1][j][i] * exp(-0.5 * (ek3[k - 1][j][i] + ek3[k][j][i]));
@@ -122,12 +129,12 @@ ma3f compute_par_c(ma3f chl, ma2f qsr, ma3f e3t) {
     // Computation of the PAR as the average of the three values.
     for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
-            for (size_t k = 1; k < NZ; k++) {
+            for (size_t k = 0; k < NZ; k++) {
+                if (tmask[k][j][i] == 0)
+                    continue;
                 output[k][j][i] = (ze1[k][j][i] + ze2[k][j][i] + ze3[k][j][i]) / 3.;
+                printf("output = %f\n", output[k][j][i]);
             }
         }
     }
-
-    return output;
-
 }

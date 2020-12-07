@@ -6,11 +6,7 @@
 #define NROWS 4
 #define NCOLS 61
 
-
 void init_zrgb(void);
-ma3f compute_par_c(void);
-
-// Dimnsion: CHL concentration; R/G/B
-ma2f zrgb(boost::extents[NROWS][NCOLS]);
+void compute_par_c(ma3f &output, ma3f chl, ma2f qsr, ma3f e3t, ma3f tmask);
 
 #endif

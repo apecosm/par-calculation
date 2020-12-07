@@ -24,9 +24,9 @@
 #define NTIME 73
 
 #define TIMEDIMENSION "time_counter"
-#define VVL
+#undef VVL
 
-#define mesh_mask "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/mesh_mask.nc"
+#define mesh_mask "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/new_mesh_mask.nc"
 
 #define chl_pattern "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/Chltot.nc"
 #define chl_var "Chltot"

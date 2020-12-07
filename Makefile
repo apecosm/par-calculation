@@ -4,6 +4,8 @@ SRC = $(wildcard *cpp)
 OBJS = $(SRC:.cpp=.o)
 #OBJS := $(addprefix obj/, $(OBJS))
 
+OBJS = main.o ncio.o par.o string_util.o
+
 all: bin
 
 bin:

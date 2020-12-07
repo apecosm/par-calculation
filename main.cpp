@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     ma2f qsr(boost::extents[ny][nx]);
 
     // Reading variable for e3t
-    //read_var(e3t, mesh_mask, "e3t_0", 0);
+    read_var(e3t, mesh_mask, "e3t_0", 0);
 
     for (int t = 0; t < 1; t++) {
 
@@ -102,18 +102,18 @@ int main(int argc, char *argv[]) {
 
         printf("+++++++++++++++++++++++++++++++ time = %d\n", t);
 
-        //read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, cptqsr);
-        //read_var(chl, list_chl_files[ichl].c_str(), chl_var, cptchl);
+        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, cptqsr);
+        read_var(chl, list_chl_files[ichl].c_str(), chl_var, cptchl);
 #ifdef VVL
-        //read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, cpte3t);
+        read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, cpte3t);
 #endif
 
         if (iout == 0) {
             define_output_file(cptout);
         }
 
-        //write_step(cptout, iout, chl);
-        //iout++;
+        write_step(cptout, iout, chl);
+        iout++;
 
         if (iout == output_frequency) {
             iout = 0;

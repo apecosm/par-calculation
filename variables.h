@@ -14,13 +14,34 @@
 #define TIMEDIMENSION "time_counter"
 #define VVL
 */
-extern size_t LON_MPI;
-extern size_t LAT_MPI;
-extern size_t NX;
-extern size_t NY;
-extern size_t NZ;
-extern size_t NTIME;
-extern const char *TIMEDIMENSION;
+
+
+#define LON_MPI 1
+#define LAT_MPI 1
+#define NX 32
+#define NY 22
+#define NZ 31
+#define NTIME 73
+
+#define TIMEDIMENSION "time_counter"
+#define VVL
+
+#define mesh_mask "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/mesh_mask.nc"
+
+#define chl_pattern "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/Chltot.nc"
+#define chl_var "Chltot"
+
+#define qsr_pattern "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc"
+#define qsr_var "soshfldo"
+
+#ifdef VVL
+#define e3t_pattern "/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc"
+#define e3t_var "votemper"
+#endif
+
+#define output_prefix "clim_GYRE_5d_00010101_00101231_PAR"
+#define output_var "par"
+#define output_frequency 73
 
 // Macros to recover MPI sub-domain
 #define get_istart(p) (istart[(int) (p % LON_MPI)])

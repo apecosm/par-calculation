@@ -7,6 +7,6 @@
 #define NCOLS 61
 
 void init_zrgb(void);
-void compute_par_c(ma3d &output, ma3d chl, ma2d qsr, ma3d e3t, ma3d tmask);
+void compute_par_c(ma3f &output, ma3f chl, ma2f qsr, ma3f e3t, ma3f tmask);
 
 #endif

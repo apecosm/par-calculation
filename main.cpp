@@ -74,13 +74,13 @@ int main(int argc, char *argv[]) {
     int ny = get_ny(mpiRank);
 
     // Init. the input arrays
-    ma3d tmask(boost::extents[NZ][ny][nx]);
-    ma3d e3t(boost::extents[NZ][ny][nx]);
-    ma3d chl(boost::extents[NZ][ny][nx]);
-    ma2d qsr(boost::extents[ny][nx]);
-    ma3d par(boost::extents[NZ][ny][nx]);
+    ma3f tmask(boost::extents[NZ][ny][nx]);
+    ma3f e3t(boost::extents[NZ][ny][nx]);
+    ma3f chl(boost::extents[NZ][ny][nx]);
+    ma2f qsr(boost::extents[ny][nx]);
+    ma3f par(boost::extents[NZ][ny][nx]);
 #ifdef PARFRAC
-    ma3d parfrac(boost::extents[NFRAC][ny][nx]);
+    ma3f parfrac(boost::extents[NFRAC][ny][nx]);
     read_parfrac(parfrac, parfrac_file, parfrac_var);
 #endif
 

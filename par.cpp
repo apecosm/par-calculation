@@ -70,22 +70,22 @@ void init_zrgb(void) {
     zrgb[0][60] = 10.000, zrgb[1][60] = 0.47804, zrgb[2][60] = 0.27178, zrgb[3][60] = 0.56870;
 }
 
-void compute_par_c(ma3d &output, ma3d chl, ma2d qsr, ma3d e3t, ma3d tmask) {
+void compute_par_c(ma3f &output, ma3f chl, ma2f qsr, ma3f e3t, ma3f tmask) {
 
     int nx = get_nx(mpiRank);
     int ny = get_ny(mpiRank);
 
-    ma3d ze1(boost::extents[NZ][ny][nx]);
-    ma3d ze2(boost::extents[NZ][ny][nx]);
-    ma3d ze3(boost::extents[NZ][ny][nx]);
-    ma3d ek1(boost::extents[NZ][ny][nx]);
-    ma3d ek2(boost::extents[NZ][ny][nx]);
-    ma3d ek3(boost::extents[NZ][ny][nx]);
+    ma3f ze1(boost::extents[NZ][ny][nx]);
+    ma3f ze2(boost::extents[NZ][ny][nx]);
+    ma3f ze3(boost::extents[NZ][ny][nx]);
+    ma3f ek1(boost::extents[NZ][ny][nx]);
+    ma3f ek2(boost::extents[NZ][ny][nx]);
+    ma3f ek3(boost::extents[NZ][ny][nx]);
 
     // Computation of the irgb index value, obtained from CHL inputs
     // It is basically the row index
     // TODO: add the verificiation as in the p4zopt.F90
-    // ma2d irgb(boost.extents[nOceanCell][NLEVEL_OPA]);
+    // ma2f irgb(boost.extents[nOceanCell][NLEVEL_OPA]);
     for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
             for (size_t k = 0; k < NZ; k++) {

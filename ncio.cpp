@@ -105,6 +105,9 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
     int ncid;
     int varid;
 
+    if (mpiRank == 0)
+        printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
 
@@ -129,8 +132,6 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
         ERR(status);
     }
 
-    if (mpiRank == 0)
-        printf("%s: reading %s, step=%ld\n", varname, filename, i0);
 
     for (size_t k = 0; k < NZ; k++) {
         for (size_t j = 0; j < ny; j++) {
@@ -155,6 +156,9 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, d
     int status;
     int ncid;
     int varid;
+    
+    if (mpiRank == 0)
+        printf("%s: reading %s, step=%ld\n", varname, filename, i0);
 
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
@@ -192,8 +196,6 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, d
         ERR(status);
     }
 
-    if (mpiRank == 0)
-        printf("%s: reading %s, step=%ld\n", varname, filename, i0);
 }
 
 void define_output_file(int cpt) {

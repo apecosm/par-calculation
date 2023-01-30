@@ -5,3 +5,8 @@ Makefile.inc
 *.sh
 *.log
 .vscode/*.json
+mpi_recpar.pbs
+mpi_recpar.pbs.o*
+variables-ssp126.h
+variables-ssp585.h
+

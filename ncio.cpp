@@ -5,7 +5,9 @@
 #include <dirent.h>
 #include <mpi.h>
 #include <netcdf.h>
+#ifdef PAR_NETCDF
 #include <netcdf_par.h>
+#endif
 #include <regex>
 #include <vector>
 
@@ -16,8 +18,8 @@
         exit(ERRCODE);                         \
     }
 
-/** Reads a 2D (y, x) output variable. 
- * 
+/** Reads a 2D (y, x) output variable.
+ *
 */
 void read_gridvar(ma3f &var, const char *filename, const char *varname) {
 
@@ -28,11 +30,19 @@ void read_gridvar(ma3f &var, const char *filename, const char *varname) {
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
 
+#ifdef PAR_NETCDF
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
         printf("Error opening %s\n", filename);
         ERR(status);
     }
+#else
+    status = nc_open(filename, NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error opening %s\n", filename);
+        ERR(status);
+    }
+#endif
 
     status = nc_inq_varid(ncid, varname, &varid);
     if (status != NC_NOERR) {
@@ -59,8 +69,8 @@ void read_gridvar(ma3f &var, const char *filename, const char *varname) {
         printf("%s: reading %s\n", varname, filename);
 }
 
-/** Get the number of time steps stored in a NetCDF output file 
- * 
+/** Get the number of time steps stored in a NetCDF output file
+ *
 */
 size_t get_ntime_file(const char *filename) {
 
@@ -69,11 +79,19 @@ size_t get_ntime_file(const char *filename) {
     int dimid;
     size_t nsteps;
 
+#ifdef PAR_NETCDF
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
         printf("Error reading %s\n", filename);
         ERR(status);
     }
+#else
+    status = nc_open(filename, NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error reading %s\n", filename);
+        ERR(status);
+    }
+#endif
 
     status = nc_inq_dimid(ncid, TIMEDIMENSION, &dimid);
     if (status != NC_NOERR) {
@@ -96,8 +114,8 @@ size_t get_ntime_file(const char *filename) {
     return nsteps;
 }
 
-/** Reads a 3D (depth, y, x) variable from NetCDF. 
- * 
+/** Reads a 3D (depth, y, x) variable from NetCDF.
+ *
 */
 void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, double conversion) {
 
@@ -111,11 +129,19 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
 
+#ifdef PAR_NETCDF
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
         printf("Error reading file %s\n", filename);
         ERR(status);
     }
+#else
+    status = nc_open(filename, NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error reading file %s\n", filename);
+        ERR(status);
+    }
+#endif
 
     status = nc_inq_varid(ncid, varname, &varid);
     if (status != NC_NOERR) {
@@ -148,26 +174,34 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
     }
 }
 
-/** Reads a 2D (y, x) output variable. 
- * 
+/** Reads a 2D (y, x) output variable.
+ *
 */
 void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, double conversion) {
 
     int status;
     int ncid;
     int varid;
-    
+
     if (mpiRank == 0)
         printf("%s: reading %s, step=%ld\n", varname, filename, i0);
 
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
 
+ #ifdef PAR_NETCDF
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
         printf("Error reading file %s\n", filename);
         ERR(status);
     }
+#else
+    status = nc_open(filename, NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error reading file %s\n", filename);
+        ERR(status);
+    }
+#endif
 
     status = nc_inq_varid(ncid, varname, &varid);
     if (status != NC_NOERR) {

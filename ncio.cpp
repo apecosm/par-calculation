@@ -235,22 +235,37 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, d
 void define_output_file(int cpt) {
 
     char ncfile[1096];
-    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
 
     int status;
     int ncid;
     int timeid;
     int yd, xd, zd;
 
+#ifdef PAR_NETCDF
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
     int nx = NX;
     int ny = NY;
     int nz = NZ;
+#else
+    sprintf(ncfile, "%s_%.05d.nc.%3d", output_prefix, cpt, mpiRank);
+    int nx = get_nx(mpiRank);
+    int ny = get_ny(mpiRank);
+    int nz = NZ;
+#endif
 
+#ifdef PAR_NETCDF
     status = nc_create_par(ncfile, NC_CLOBBER | NC_NETCDF4 | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
         printf("Error creating filename %s\n", ncfile);
         ERR(status);
     }
+#else
+    status = nc_create(ncfile, NC_NETCDF4, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error creating filename %s\n", ncfile);
+        ERR(status);
+    }
+#endif
 
     status = nc_def_dim(ncid, "time", NC_UNLIMITED, &timeid);
     if (status != NC_NOERR) {
@@ -317,14 +332,26 @@ void write_step(int cpt, int step, ma3f var, int time) {
     size_t nx = get_nx(mpiRank);
     size_t ny = get_ny(mpiRank);
 
+#ifdef PAR_NETCDF
     size_t start[] = {(size_t)step, 0, get_jstart(mpiRank), get_istart(mpiRank)};
+#else
+    size_t start[] = {(size_t)step, 0, 0, 0};
+#endif
     size_t count[] = {1, NZ, ny, nx};
 
+#ifdef PAR_NETCDF
     status = nc_open_par(ncfile, NC_WRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
         printf("Error opening the file %s\n", ncfile);
         ERR(status);
     }
+#else
+    status = nc_open(ncfile, NC_WRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error opening the file %s\n", ncfile);
+        ERR(status);
+    }
+#endif
 
     if (mpiRank == 0)
         printf("%s: writting %s, step=%d\n", output_var, ncfile, step);
@@ -335,11 +362,13 @@ void write_step(int cpt, int step, ma3f var, int time) {
         ERR(status);
     }
 
+#ifdef PAR_NETCDF
     status = nc_var_par_access(ncid, varid, NC_COLLECTIVE);
     if (status != NC_NOERR) {
         printf("Error setting var access variable %s\n", output_var);
         ERR(status);
     }
+#endif
 
     status = nc_put_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
@@ -357,11 +386,13 @@ void write_step(int cpt, int step, ma3f var, int time) {
         ERR(status);
     }
 
+#ifdef PAR_NETCDF
     status = nc_var_par_access(ncid, tid, NC_COLLECTIVE);
     if (status != NC_NOERR) {
         printf("Error setting var access variable %s\n", "time");
         ERR(status);
     }
+#endif
 
     status = nc_put_vara_int(ncid, tid, tstart, tcount, &time);
     if (status != NC_NOERR) {
@@ -388,11 +419,19 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
 
+#ifdef PAR_NETCDF
     status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
         printf("Error reading var %s\n", filename);
         ERR(status);
     }
+#else
+    status = nc_open_par(filename, NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error reading var %s\n", filename);
+        ERR(status);
+    }
+#endif
 
     status = nc_inq_varid(ncid, varname, &varid);
     if (status != NC_NOERR) {

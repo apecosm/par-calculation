@@ -39,7 +39,7 @@ foreach(file ${testFiles})
     ADD_TEST(NAME run_${exeName} COMMAND ${exeName})
 
     # check that the build_test_cpp passed before running the exe.
-    SET_TESTS_PROPERTIES(run_${exeName} PROPERTIES DEPENDS build_${exeName})
+    # SET_TESTS_PROPERTIES(run_${exeName} PROPERTIES DEPENDS build_${exeName})
 
 
 endforeach(file)

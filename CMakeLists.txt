@@ -146,7 +146,7 @@ endif()
 
 set_property(TARGET par_calculation PROPERTY ENABLE_EXPORTS 1)
 
-# if(RUNNING_TESTS)
-#     enable_testing()
-#     add_subdirectory(test)
-# endif()
+if(RUNNING_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()

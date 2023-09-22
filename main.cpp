@@ -23,6 +23,10 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+    NX = get_spatial_dimension_file(mesh_mask, x_dimension);
+    NY = get_spatial_dimension_file(mesh_mask, y_dimension);
+    NZ = get_spatial_dimension_file(mesh_mask, z_dimension);
+
     // Init the RGB attenuation coefficients
     init_zrgb();
 
@@ -73,6 +77,7 @@ int main(int argc, char *argv[]) {
     ma3f par(boost::extents[NZ][ny][nx]);
     ma3f parfrac(boost::extents[NZ][ny][nx]);
     if (use_parfrac) {
+        NFRAC = get_ntime_file(parfrac_file);
         read_parfrac(parfrac, parfrac_file, parfrac_var);
     } else {
         NFRAC = 1;

@@ -1,0 +1,18 @@
+TIMEDIMENSION = time_counter
+parfrac_file = /home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc
+NFRAC =  12
+parfrac_var =  soshfldo
+mesh_mask =  /home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/new_mesh_mask.nc
+chl_pattern =  /home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/Chltot.nc
+chl_var =  Chltot
+conversion = _chl 1.0
+
+qsr_pattern =  /home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc
+qsr_var =  soshfldo
+
+e3t_pattern /home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc
+e3t_var votemper
+
+output_prefix clim_GYRE_5d_00010101_00101231_PAR
+output_var par
+output_frequency 2

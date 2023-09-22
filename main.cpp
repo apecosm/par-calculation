@@ -28,9 +28,10 @@ int main(int argc, char *argv[]) {
 
     vector<string> list_chl_files = get_files(chl_pattern);
     vector<string> list_qsr_files = get_files(qsr_pattern);
-#ifdef VVL
-    vector<string> list_e3t_files = get_files(e3t_pattern);
-#endif
+    vector<string> list_e3t_files;
+    if (use_vvl) {
+        list_e3t_files = get_files(e3t_pattern);
+    }
 
     // count the number of read for the given file
     // ichl = index of the file in the list of files
@@ -44,11 +45,15 @@ int main(int argc, char *argv[]) {
     int iqsr = 0;
     size_t nqsr = get_ntime_file(list_qsr_files[iqsr].c_str());
 
-#ifdef VVL
-    size_t stepe3t = 0;
-    int ie3t = 0;
-    size_t ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
-#endif
+    size_t stepe3t;
+    int ie3t;
+    size_t ne3t;
+
+    if (use_vvl) {
+        stepe3t = 0;
+        ie3t = 0;
+        ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
+    }
 
     // iterator for the output
     int iout = 0;
@@ -66,10 +71,19 @@ int main(int argc, char *argv[]) {
     ma3f chl(boost::extents[NZ][ny][nx]);
     ma2f qsr(boost::extents[ny][nx]);
     ma3f par(boost::extents[NZ][ny][nx]);
-#ifdef PARFRAC
-    ma3f parfrac(boost::extents[NFRAC][ny][nx]);
-    read_parfrac(parfrac, parfrac_file, parfrac_var);
-#endif
+    ma3f parfrac(boost::extents[NZ][ny][nx]);
+    if (use_parfrac) {
+        read_parfrac(parfrac, parfrac_file, parfrac_var);
+    } else {
+        NFRAC = 1;
+        float const_parfrac = stof(parameters["constant_parfrac"]);
+        ma3f parfrac(boost::extents[NFRAC][ny][nx]);
+        for(size_t j=0; j<ny;j++) {
+            for(size_t i=0; i<nx;i++) {
+                parfrac[0][j][i] = const_parfrac;
+            }
+        }
+    }
 
     // Reading variable for e3t
     read_gridvar(e3t, mesh_mask, "e3t_0");
@@ -92,13 +106,13 @@ int main(int argc, char *argv[]) {
             nqsr = get_ntime_file(list_qsr_files[iqsr].c_str());
         }
 
-#ifdef VVL
-        if (stepe3t == ne3t) {
-            ie3t++;
-            stepe3t = 0;
-            ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
+        if (use_vvl) {
+            if (stepe3t == ne3t) {
+                ie3t++;
+                stepe3t = 0;
+                ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
+            }
         }
-#endif
 
         if(mpiRank == 0) printf("++++++ time = %d\n", time);
 
@@ -108,7 +122,6 @@ int main(int argc, char *argv[]) {
         read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
 #endif
 
-#ifdef PARFRAC
         int ifrac = time % NFRAC;
         if(mpiRank == 0) printf("ifrac = %d\n", ifrac);
         for (int j = 0; j < ny; j++) {
@@ -117,7 +130,6 @@ int main(int argc, char *argv[]) {
                 qsr[j][i] *= parfrac[ifrac][j][i];
             }
         }
-#endif
 
         // computation of PAR.
         compute_par_c(par, chl, qsr, e3t, tmask);

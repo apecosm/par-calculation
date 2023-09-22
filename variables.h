@@ -43,24 +43,24 @@ extern int NTIME;
 
 
 /** Define the name of the time dimension in the file. */
-extern char* TIMEDIMENSION;
+extern string time_dimension;
 
 /** Name of the Parfrac file */
-extern char* parfrac_file;
+extern string parfrac_file;
 
 /** Number of time steps in the par frac file. */
 extern size_t NFRAC;
 
 /** Name of the PAR FRAC variable */
-extern char* parfrac_var;
+extern string parfrac_var;
 
 /** Name of the mesh_mask file */
-extern char* mesh_mask;
+extern string mesh_mask;
 
 /** Pattern of the Chl files to read */
-extern char* chl_pattern;
+extern string chl_pattern;
 /** Name of the Chl variable */
-extern char* chl_var;
+extern string chl_var;
 /** Conversion factor to convert Chl in mg/m3 */
 extern double conversion_chl;
 
@@ -80,6 +80,9 @@ extern string output_prefix;
 extern string output_var;
 /** Number of time steps in an output file. */
 extern int output_frequency;
+
+extern bool use_vvl;
+extern bool use_parfrac;
 
 extern std::map<std::string, std::string> parameters;
 

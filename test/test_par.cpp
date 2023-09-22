@@ -7,50 +7,70 @@
 int main(int argc, char *argv[]) {
 
     read_parameters("parameters.csv");
+    set_parameters();
 
-    if (parameters.size() != 15) {
-        printf("Wrong number of parameters. Expected 15, got %ld\n", parameters.size());
+    if (time_dimension.compare("time_counter") != 0) {
+        printf("Error reading time_dimension\n");
         return 1;
     }
 
-    if (parameters["TIMEDIMENSION"].compare("time_counter") != 0) {
-        printf("Error reading TIMEDIMENSION\n");
-        return 1;
-    }
-
-    if (parameters["parfrac_file"].compare("/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc") != 0) {
+    if (parfrac_file.compare("/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/clim_GYRE_5d_00010101_00101231_grid_T.nc") != 0) {
         printf("Error reading parfrac_file\n");
         return 1;
     }
 
-    if (parameters["NFRAC"].compare("12") != 0) {
+    if (NFRAC !=  12) {
         printf("Error reading NFRAC\n");
         return 1;
     }
 
-    if (parameters["parfrac_var"].compare("soshfldo") != 0) {
+    if (parfrac_var.compare("soshfldo") != 0) {
         printf("Error reading parfrac_var\n");
         return 1;
     }
 
-    if (parameters["mesh_mask"].compare("/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/new_mesh_mask.nc") != 0) {
+    if (mesh_mask.compare("/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/new_mesh_mask.nc") != 0) {
         printf("Error reading mesh_mask\n");
         return 1;
     }
 
-    if (parameters["chl_pattern"].compare("/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/Chltot.nc") != 0) {
+    if (chl_pattern.compare("/home/barrier/Codes/apecosm/git-apecosm-config/gyre/data/Chltot.nc") != 0) {
         printf("Error reading chl_pattern\n");
         return 1;
     }
 
-    if (parameters["chl_var"].compare("Chltot") != 0) {
+    if (chl_var.compare("Chltot") != 0) {
         printf("Error reading chl_var\n");
         return 1;
     }
 
-    if (parameters["conversion_chl"].compare("1.0") != 0) {
+    if (conversion_chl != 1.0) {
         printf("Error reading conversion_chl\n");
         return 1;
+    }
+
+    if (LON_MPI != 3) {
+        printf("Error reading LON_MPI\n");
+    }
+
+    if (LAT_MPI != 2) {
+        printf("Error reading LAT_MPI\n");
+    }
+
+    if (NX != 12) {
+        printf("Error reading NX\n");
+    }
+
+    if (NY != 14) {
+        printf("Error reading NY\n");
+    }
+
+    if (NZ != 31) {
+        printf("Error reading NZ\n");
+    }
+
+    if (NTIME != 50) {
+        printf("Error reading NTIME\n");
     }
 
     return 0;

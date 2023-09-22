@@ -79,7 +79,7 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
 /** Get the number of time steps stored in a NetCDF output file
  *
 */
-size_t get_ntime_file(const char *filename) {
+size_t get_ntime_file(string filename) {
 
     int ncid;
     int status;
@@ -87,34 +87,34 @@ size_t get_ntime_file(const char *filename) {
     size_t nsteps;
 
 #ifdef PAR_NETCDF
-    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading %s\n", filename);
+        printf("Error reading %s\n", filename.c_str());
         ERR(status);
     }
 #else
-    status = nc_open(filename, NC_NOWRITE, &ncid);
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading %s\n", filename);
+        printf("Error reading %s\n", filename.c_str());
         ERR(status);
     }
 #endif
 
-    status = nc_inq_dimid(ncid, TIMEDIMENSION, &dimid);
+    status = nc_inq_dimid(ncid, time_dimension.c_str(), &dimid);
     if (status != NC_NOERR) {
-        printf("Error inq. %s\n", TIMEDIMENSION);
+        printf("Error inq. %s\n", time_dimension.c_str());
         ERR(status);
     }
 
     status = nc_inq_dimlen(ncid, dimid, &nsteps);
     if (status != NC_NOERR) {
-        printf("Error inq. dim length %s\n", TIMEDIMENSION);
+        printf("Error inq. dim length %s\n", time_dimension.c_str());
         ERR(status);
     }
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
-        printf("Error closing file %s\n", filename);
+        printf("Error closing file %s\n", filename.c_str());
         ERR(status);
     }
 
@@ -416,7 +416,7 @@ void write_step(int cpt, int step, ma3f var, int time) {
 
 /** Reads the entire parfrac time series on the given tile.
 */
-void read_parfrac(ma3f &var, const char *filename, const char *varname) {
+void read_parfrac(ma3f &var, string filename, string varname) {
 
     int status;
     int ncid;
@@ -426,22 +426,22 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
     size_t nx = get_nx(mpiRank);
 
 #ifdef PAR_NETCDF
-    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading var %s\n", filename);
+        printf("Error reading var %s\n", filename.c_str());
         ERR(status);
     }
 #else
-    status = nc_open(filename, NC_NOWRITE, &ncid);
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading var %s\n", filename);
+        printf("Error reading var %s\n", filename.c_str());
         ERR(status);
     }
 #endif
 
-    status = nc_inq_varid(ncid, varname, &varid);
+    status = nc_inq_varid(ncid, varname.c_str(), &varid);
     if (status != NC_NOERR) {
-        printf("Error inq. %s\n", varname);
+        printf("Error inq. %s\n", varname.c_str());
         ERR(status);
     }
 
@@ -450,18 +450,18 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
 
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
-        printf("Error reading %s\n", varname);
+        printf("Error reading %s\n", varname.c_str());
         ERR(status);
     }
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
-        printf("Error closing file %s\n", "filename");
+        printf("Error closing file %s\n", filename.c_str());
         ERR(status);
     }
 
     if (mpiRank == 0)
-        printf("%s: reading %s, step=[0, %ld]\n", varname, filename, NFRAC - 1);
+        printf("%s: reading %s, step=[0, %ld]\n", varname.c_str(), filename.c_str(), NFRAC - 1);
 }
 
 void read_parameters(string filename) {
@@ -498,6 +498,7 @@ void read_parameters(string filename) {
 
 void set_parameters() {
 
+    // Definition the spatial variables
     LON_MPI = stoi(parameters["LON_MPI"]);
     LAT_MPI = stoi(parameters["LAT_MPI"]);
     NX = stoi(parameters["NX"]);
@@ -505,7 +506,36 @@ void set_parameters() {
     NZ = stoi(parameters["NZ"]);
     NTIME = stoi(parameters["NTIME"]);
 
+    // define name of time dimension
+    time_dimension = parameters["time_dimension"];
+
+    // define pattern
+    chl_pattern = parameters["chl_pattern"];
+    chl_var = parameters["chl_var"];
+
+    qsr_pattern = parameters["qsr_pattern"];
+    qsr_var = parameters["qsr_var"];
+
+    output_prefix = parameters["output_prefix"];
+    output_var = parameters["output_var"];
+    output_frequency = stoi(parameters["output_frequency"]);
+
     qsr_pattern = parameters["qsr_pattern"];
 
+    // Check if VVL is defined.
+    if((parameters.find("e3t_pattern") == parameters.end()) || (parameters.find("e3t_var") == parameters.end())) {
+        use_vvl = false;
+    } else {
+        e3t_pattern = parameters["e3t_pattern"];
+        e3t_var = parameters["e3t_var"];
+    }
+
+        // Check if VVL is defined.
+    if((parameters.find("e3t_pattern") == parameters.end()) || (parameters.find("e3t_var") == parameters.end())) {
+        use_vvl = false;
+    } else {
+        e3t_pattern = parameters["e3t_pattern"];
+        e3t_var = parameters["e3t_var"];
+    }
 
 }

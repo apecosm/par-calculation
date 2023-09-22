@@ -77,7 +77,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 ################################################################# User defined options
 
 set(RUNNING_TESTS true CACHE BOOL "True if tests should be running")
-set(BUILD_MODE "release" CACHE STRING "Build mode (debug, release)")
+set(BUILD_MODE "debug" CACHE STRING "Build mode (debug, release)")
 set(BOOST_ASSERT false CACHE BOOL "True if Boost assert is on. Default is False")
 set(USE_PARALLEL_NETCDF false CACHE BOOL "True if the Parallel Netcdf should be used. Default is False")
 
@@ -114,8 +114,11 @@ if(USE_PARALLEL_NETCDF)
 endif()
 
 if(BUILD_MODE STREQUAL "release")
+    # If NEMO is not used, the executable is created
+    MESSAGE(STATUS "Release mode")
     set(CMAKE_BUILD_TYPE Release)
 elseif(BUILD_MODE STREQUAL "debug")
+    MESSAGE(STATUS "Debug mode")
     set(CMAKE_BUILD_TYPE Debug)
     add_compile_options(-DNDEBUG)
 else()

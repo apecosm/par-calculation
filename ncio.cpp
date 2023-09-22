@@ -416,7 +416,6 @@ void write_step(int cpt, int step, ma3f var, int time) {
 
 /** Reads the entire parfrac time series on the given tile.
 */
-#ifdef PARFRAC
 void read_parfrac(ma3f &var, const char *filename, const char *varname) {
 
     int status;
@@ -433,7 +432,7 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
         ERR(status);
     }
 #else
-    status = nc_open_par(filename, NC_NOWRITE, &ncid);
+    status = nc_open(filename, NC_NOWRITE, &ncid);
     if (status != NC_NOERR) {
         printf("Error reading var %s\n", filename);
         ERR(status);
@@ -462,9 +461,8 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
     }
 
     if (mpiRank == 0)
-        printf("%s: reading %s, step=[0, %d]\n", varname, filename, NFRAC - 1);
+        printf("%s: reading %s, step=[0, %ld]\n", varname, filename, NFRAC - 1);
 }
-#endif
 
 void read_parameters(string filename) {
 

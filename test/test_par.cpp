@@ -9,6 +9,7 @@ int main(int argc, char *argv[]) {
     read_parameters("parameters.csv");
 
     if (parameters.size() != 15) {
+        printf("Wrong number of parameters. Expected 15, got %ld", parameters.size());
         return 1;
     }
 

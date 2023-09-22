@@ -47,7 +47,7 @@ char* TIMEDIMENSION;
 char* parfrac_file;
 
 /** Number of time steps in the par frac file. */
-int NFRAC;
+size_t NFRAC;
 
 /** Name of the PAR FRAC variable */
 char* parfrac_var;

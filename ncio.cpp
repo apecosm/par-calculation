@@ -468,7 +468,7 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
 
 void read_parameters(string filename) {
 
-    std::regex regexp_line("[^a-zA-Z.*=.*$");
+    std::regex regexp_line("^[a-zA-Z].*=.*$");
 
     string line, word;
     vector<string> row;

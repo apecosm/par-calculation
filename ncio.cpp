@@ -542,3 +542,15 @@ void set_parameters() {
     }
 
 }
+
+
+size_t get_total_ntime(vector<string> list_of_files) {
+
+    int ntotal = 0;
+    for(int i = 0; i < list_of_files.size(); i++) {
+        ntotal += get_ntime_file(list_of_files[0]);
+    }
+
+    return ntotal;
+
+}

@@ -1,11 +1,15 @@
 
+#include "ncio.h"
+#include "string_util.h"
+#include "variables.h"
 #include <filesystem>
 #include <iostream>
-#include "ncio.h"
-#include "variables.h"
-#include "string_util.h"
+#include <vector>
 
 namespace fs = std::filesystem;
+
+int test_chl_files();
+int test_qsr_files();
 
 /** Running the test on the ORCA1 grid (Northfold F-pivot, zonal cyclicity) */
 int main(int argc, char *argv[]) {
@@ -13,8 +17,21 @@ int main(int argc, char *argv[]) {
     read_parameters("parameters_1d.csv");
     set_parameters();
 
+    if (test_chl_files) {
+        return 1;
+    }
+
+    if (test_qsr_files) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int test_chl_files() {
+
     vector<string> list_chl_files = get_files(chl_pattern);
-    if(list_chl_files.size() != 6) {
+    if (list_chl_files.size() != 6) {
         printf("Number of Chl files is wrong. Expected 6, got %ld\n", list_chl_files.size());
         return 1;
     }
@@ -64,8 +81,35 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    if (get_ntime_file(list_chl_files[0]) != 1416) {
+        return 1;
+    }
+    if (get_ntime_file(list_chl_files[1]) != 1464) {
+        return 1;
+    }
+    if (get_ntime_file(list_chl_files[2]) != 1464) {
+        return 1;
+    }
+    if (get_ntime_file(list_chl_files[3]) != 1488) {
+        return 1;
+    }
+    if (get_ntime_file(list_chl_files[4]) != 1464) {
+        return 1;
+    }
+    if (get_ntime_file(list_chl_files[5]) != 1464) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int test_qsr_files() {
+
+    fs::path p1;
+    fs::path p2;
+
     vector<string> list_qsr_files = get_files(qsr_pattern);
-    if(list_qsr_files.size() != 12) {
+    if (list_qsr_files.size() != 12) {
         printf("Number of Chl files is wrong. Expected 6, got %ld\n", list_qsr_files.size());
         return 1;
     }
@@ -142,4 +186,48 @@ int main(int argc, char *argv[]) {
         printf("Error with qsr file [11]\n");
         return 1;
     }
+
+    if (get_total_ntime(list_qsr_files) != 8760) {
+        printf("Error reading total number of time-steps in qsr");
+        return 1;
+    }
+
+    if (get_ntime_file(list_qsr_files[0]) != 744) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[1]) != 672) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[2]) != 744) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[3]) != 720) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[4]) != 744) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[5]) != 720) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[6]) != 744) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[7]) != 744) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[8]) != 720) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[9]) != 744) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[10]) != 720) {
+        return 1;
+    }
+    if (get_ntime_file(list_qsr_files[11]) != 744) {
+        return 1;
+    }
+
+    return 0;
 }

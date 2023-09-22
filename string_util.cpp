@@ -3,6 +3,8 @@
 #include <vector>
 #include "string_util.h"
 
+using namespace std;
+
 /** https://thispointer.com/c-how-to-get-filename-from-a-path-with-or-without-extension-boost-c17-filesytem-library/ */
 std::string getFileName(std::string filePath) {
 
@@ -38,16 +40,16 @@ std::string getDirName(std::string filePath) {
 
 
 /**  \brief Extract the list of files that match a given pattern.
- * 
+ *
  * @param file_prefix File prefix
- * 
+ *
  * @author Nicolas Barrier
- * 
+ *
 */
-std::vector<std::string> get_files(const char *file_prefix) {
+std::vector<std::string> get_files(const string file_prefix) {
 
-    std::string path = getDirName(std::string(file_prefix));
-    std::string name = getFileName(std::string(file_prefix));
+    std::string path = getDirName(file_prefix);
+    std::string name = getFileName(file_prefix);
 
     // If path is null, forces it to be "./"
     if (path == "") {

@@ -28,7 +28,7 @@ using namespace std;
 /** Reads a 2D (y, x) output variable.
  *
 */
-void read_gridvar(ma3f &var, const char *filename, const char *varname) {
+void read_gridvar(ma3f &var, const std::string filename, const std::string varname) {
 
     int status;
     int ncid;
@@ -38,22 +38,22 @@ void read_gridvar(ma3f &var, const char *filename, const char *varname) {
     size_t nx = get_nx(mpiRank);
 
 #ifdef PAR_NETCDF
-    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
-        printf("Error opening %s\n", filename);
+        printf("Error opening %s\n", filename.c_str());
         ERR(status);
     }
 #else
-    status = nc_open(filename, NC_NOWRITE, &ncid);
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
     if (status != NC_NOERR) {
-        printf("Error opening %s\n", filename);
+        printf("Error opening %s\n", filename.c_str());
         ERR(status);
     }
 #endif
 
-    status = nc_inq_varid(ncid, varname, &varid);
+    status = nc_inq_varid(ncid, varname.c_str(), &varid);
     if (status != NC_NOERR) {
-        printf("Error inq %s\n", varname);
+        printf("Error inq %s\n", varname.c_str());
         ERR(status);
     }
 
@@ -62,18 +62,18 @@ void read_gridvar(ma3f &var, const char *filename, const char *varname) {
 
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
-        printf("Error reading %s\n", varname);
+        printf("Error reading %s\n", varname.c_str());
         ERR(status);
     }
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
-        printf("Error closing %s\n", filename);
+        printf("Error closing %s\n", filename.c_str());
         ERR(status);
     }
 
     if (mpiRank == 0)
-        printf("%s: reading %s\n", varname, filename);
+        printf("%s: reading %s\n", varname.c_str(), filename.c_str());
 }
 
 /** Get the number of time steps stored in a NetCDF output file
@@ -124,14 +124,14 @@ size_t get_ntime_file(const char *filename) {
 /** Reads a 3D (depth, y, x) variable from NetCDF.
  *
 */
-void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, double conversion) {
+void read_var(ma3f &var, const std::string filename, const std::string varname, size_t i0, double conversion) {
 
     int status;
     int ncid;
     int varid;
 
     if (mpiRank == 0)
-        printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+        printf("%s: reading %s, step=%ld\n", varname.c_str(), filename.c_str(), i0);
 
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
@@ -143,16 +143,16 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
         ERR(status);
     }
 #else
-    status = nc_open(filename, NC_NOWRITE, &ncid);
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading file %s\n", filename);
+        printf("Error reading file %s\n", filename.c_str());
         ERR(status);
     }
 #endif
 
-    status = nc_inq_varid(ncid, varname, &varid);
+    status = nc_inq_varid(ncid, varname.c_str(), &varid);
     if (status != NC_NOERR) {
-        printf("Error inq. var %s\n", varname);
+        printf("Error inq. var %s\n", varname.c_str());
         ERR(status);
     }
 
@@ -161,7 +161,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
 
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
-        printf("Error reading var %s\n", varname);
+        printf("Error reading var %s\n", varname.c_str());
         ERR(status);
     }
 
@@ -176,7 +176,7 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
-        printf("Error closing file %s\n", filename);
+        printf("Error closing file %s\n", filename.c_str());
         ERR(status);
     }
 }
@@ -184,35 +184,35 @@ void read_var(ma3f &var, const char *filename, const char *varname, size_t i0, d
 /** Reads a 2D (y, x) output variable.
  *
 */
-void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, double conversion) {
+void read_var(ma2f &var, const std::string filename, const std::string varname, size_t i0, double conversion) {
 
     int status;
     int ncid;
     int varid;
 
     if (mpiRank == 0)
-        printf("%s: reading %s, step=%ld\n", varname, filename, i0);
+        printf("%s: reading %s, step=%ld\n", varname.c_str(), filename.c_str(), i0);
 
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
 
  #ifdef PAR_NETCDF
-    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading file %s\n", filename);
+        printf("Error reading file %s\n", filename.c_str());
         ERR(status);
     }
 #else
-    status = nc_open(filename, NC_NOWRITE, &ncid);
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading file %s\n", filename);
+        printf("Error reading file %s\n", filename.c_str());
         ERR(status);
     }
 #endif
 
-    status = nc_inq_varid(ncid, varname, &varid);
+    status = nc_inq_varid(ncid, varname.c_str(), &varid);
     if (status != NC_NOERR) {
-        printf("Error inq. variable %s\n", varname);
+        printf("Error inq. variable %s\n", varname.c_str());
         ERR(status);
     }
 
@@ -221,7 +221,7 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, d
 
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
-        printf("Error reading variable %s\n", varname);
+        printf("Error reading variable %s\n", varname.c_str());
         ERR(status);
     }
 
@@ -233,7 +233,7 @@ void read_var(ma2f &var, const char *filename, const char *varname, size_t i0, d
 
     status = nc_close(ncid);
     if (status != NC_NOERR) {
-        printf("Error closing file %s\n", filename);
+        printf("Error closing file %s\n", filename.c_str());
         ERR(status);
     }
 
@@ -254,7 +254,7 @@ void define_output_file(int cpt) {
     int ny = NY;
     int nz = NZ;
 #else
-    sprintf(ncfile, "%s_%.05d.nc.%3d", output_prefix, cpt, mpiRank);
+    sprintf(ncfile, "%s_%.05d.nc.%3d", output_prefix.c_str(), cpt, mpiRank);
     int nx = get_nx(mpiRank);
     int ny = get_ny(mpiRank);
     int nz = NZ;
@@ -301,9 +301,9 @@ void define_output_file(int cpt) {
     int output_ids[] = {timeid, zd, yd, xd};
     int varid;
 
-    status = nc_def_var(ncid, output_var, NC_FLOAT, 4, output_ids, &varid);
+    status = nc_def_var(ncid, output_var.c_str(), NC_FLOAT, 4, output_ids, &varid);
     if (status != NC_NOERR) {
-        printf("Error defining variable %s\n", output_var);
+        printf("Error defining variable %s\n", output_var.c_str());
         ERR(status);
     }
 
@@ -334,7 +334,7 @@ void write_step(int cpt, int step, ma3f var, int time) {
     int ncid, varid, status;
 
     char ncfile[1096];
-    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
 
     size_t nx = get_nx(mpiRank);
     size_t ny = get_ny(mpiRank);
@@ -361,11 +361,11 @@ void write_step(int cpt, int step, ma3f var, int time) {
 #endif
 
     if (mpiRank == 0)
-        printf("%s: writting %s, step=%d\n", output_var, ncfile, step);
+        printf("%s: writting %s, step=%d\n", output_var.c_str(), ncfile, step);
 
-    status = nc_inq_varid(ncid, output_var, &varid);
+    status = nc_inq_varid(ncid, output_var.c_str(), &varid);
     if (status != NC_NOERR) {
-        printf("Error inq. variable %s\n", output_var);
+        printf("Error inq. variable %s\n", output_var.c_str());
         ERR(status);
     }
 
@@ -379,7 +379,7 @@ void write_step(int cpt, int step, ma3f var, int time) {
 
     status = nc_put_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
-        printf("Error writting variable %s\n", output_var);
+        printf("Error writting variable %s\n", output_var.c_str());
         ERR(status);
     }
 
@@ -494,4 +494,18 @@ void read_parameters(string filename) {
     } else {
         cout << "Could not open the file\n";
     }
+}
+
+void set_parameters() {
+
+    LON_MPI = stoi(parameters["LON_MPI"]);
+    LAT_MPI = stoi(parameters["LAT_MPI"]);
+    NX = stoi(parameters["NX"]);
+    NY = stoi(parameters["NY"]);
+    NZ = stoi(parameters["NZ"]);
+    NTIME = stoi(parameters["NTIME"]);
+
+    qsr_pattern = parameters["qsr_pattern"];
+
+
 }

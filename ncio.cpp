@@ -500,6 +500,7 @@ void set_parameters() {
 
     // Definition the spatial variables
     LON_MPI = stoi(parameters["LON_MPI"]);
+
     LAT_MPI = stoi(parameters["LAT_MPI"]);
     NX = stoi(parameters["NX"]);
     NY = stoi(parameters["NY"]);

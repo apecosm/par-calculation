@@ -101,7 +101,7 @@ if(USE_PARALLEL_NETCDF)
 endif()
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(NOT BOOST_ASSERT)

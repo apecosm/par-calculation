@@ -551,12 +551,15 @@ void set_parameters() {
     y_dimension = parameters["y_dimension"];
     z_dimension = parameters["z_dimension"];
 
+    mesh_mask = parameters["mesh_mask"];
+
     // define name of time dimension
     time_dimension = parameters["time_dimension"];
 
     // define pattern
     chl_pattern = parameters["chl_pattern"];
     chl_var = parameters["chl_var"];
+    conversion_chl = stof(parameters["conversion_chl"]);
 
     qsr_pattern = parameters["qsr_pattern"];
     qsr_var = parameters["qsr_var"];
@@ -592,7 +595,7 @@ size_t get_total_ntime(vector<string> list_of_files) {
 
     int ntotal = 0;
     for(int i = 0; i < list_of_files.size(); i++) {
-        ntotal += get_ntime_file(list_of_files[0]);
+        ntotal += get_ntime_file(list_of_files[i]);
     }
 
     return ntotal;

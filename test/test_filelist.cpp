@@ -17,11 +17,11 @@ int main(int argc, char *argv[]) {
     read_parameters("parameters_1d.csv");
     set_parameters();
 
-    if (test_chl_files) {
+    if (test_chl_files()) {
         return 1;
     }
 
-    if (test_qsr_files) {
+    if (test_qsr_files()) {
         return 1;
     }
 
@@ -78,6 +78,11 @@ int test_chl_files() {
     p1 = list_chl_files[5];
     if (p1.compare(p2) != 0) {
         printf("Error with chl file [5]");
+        return 1;
+    }
+
+    if (get_total_ntime(list_chl_files) != 8760) {
+        printf("Error reading total number of time-steps in qsr");
         return 1;
     }
 

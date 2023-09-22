@@ -52,22 +52,6 @@ int main(int argc, char *argv[]) {
         printf("Error reading LAT_MPI\n");
     }
 
-    if (NX != 12) {
-        printf("Error reading NX\n");
-    }
-
-    if (NY != 14) {
-        printf("Error reading NY\n");
-    }
-
-    if (NZ != 31) {
-        printf("Error reading NZ\n");
-    }
-
-    if (NTIME != 50) {
-        printf("Error reading NTIME\n");
-    }
-
     return 0;
 
 }

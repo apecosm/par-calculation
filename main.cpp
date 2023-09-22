@@ -19,6 +19,9 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
     MPI_Comm_size(MPI_COMM_WORLD, &mpiSize);
 
+    read_parameters(filename);
+    set_parameters();
+
     if (mpiSize != LON_MPI * LAT_MPI) {
         printf("LON_MPI * LAT_MPI = %d, should be %d\n", LON_MPI * LAT_MPI, mpiSize);
         MPI_Finalize();
@@ -36,8 +39,9 @@ int main(int argc, char *argv[]) {
     NTIME = get_total_ntime(list_chl_files);
 
     vector<string> list_qsr_files = get_files(qsr_pattern);
-    if(NTIME != get_total_ntime(list_qsr_files)) {
-        printf("Different number of time steps between chl and qsr");
+    size_t nqsr_tot = get_total_ntime(list_qsr_files);
+    if(NTIME != nqsr_tot) {
+        printf("Different number of time steps between chl (%d) and qsr (%ld)\n", NTIME, nqsr_tot);
     }
 
     vector<string> list_e3t_files;

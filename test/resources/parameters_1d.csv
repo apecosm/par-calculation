@@ -1,0 +1,20 @@
+time_dimension = time_counter
+
+mesh_mask =  mesh_mask.nc
+chl_pattern =  nico_HOTv420_1ts_.*_ptrc_T.nc
+chl_var =  Chltot
+conversion_chl = 1.0
+
+qsr_pattern =  nico_HOTv420_1ts_.*_grid_T.nc
+qsr_var =  qsr_oce
+
+output_prefix=  par_test
+output_var=  par
+output_frequency = 8640
+
+NX = 12
+NY = 14
+NZ = 31
+NTIME = 50
+LON_MPI = 3
+LAT_MPI = 2

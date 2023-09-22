@@ -79,6 +79,51 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
 /** Get the number of time steps stored in a NetCDF output file
  *
 */
+size_t get_spatial_dimension_file(string filename, string dimname) {
+
+    int ncid;
+    int status;
+    int dimid;
+    size_t nsteps;
+
+#ifdef PAR_NETCDF
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error reading %s\n", filename.c_str());
+        ERR(status);
+    }
+#else
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error reading %s\n", filename.c_str());
+        ERR(status);
+    }
+#endif
+
+    status = nc_inq_dimid(ncid, dimname.c_str(), &dimid);
+    if (status != NC_NOERR) {
+        printf("Error inq. %s\n", dimname.c_str());
+        ERR(status);
+    }
+
+    status = nc_inq_dimlen(ncid, dimid, &nsteps);
+    if (status != NC_NOERR) {
+        printf("Error inq. dim length %s\n", dimname.c_str());
+        ERR(status);
+    }
+
+    status = nc_close(ncid);
+    if (status != NC_NOERR) {
+        printf("Error closing file %s\n", filename.c_str());
+        ERR(status);
+    }
+
+    return nsteps;
+}
+
+/** Get the number of time steps stored in a NetCDF output file
+ *
+*/
 size_t get_ntime_file(string filename) {
 
     int ncid;
@@ -502,9 +547,9 @@ void set_parameters() {
     LON_MPI = stoi(parameters["LON_MPI"]);
 
     LAT_MPI = stoi(parameters["LAT_MPI"]);
-    NX = stoi(parameters["NX"]);
-    NY = stoi(parameters["NY"]);
-    NZ = stoi(parameters["NZ"]);
+    x_dimension = parameters["x_dimension"];
+    y_dimension = parameters["y_dimension"];
+    z_dimension = parameters["z_dimension"];
     NTIME = stoi(parameters["NTIME"]);
 
     // define name of time dimension

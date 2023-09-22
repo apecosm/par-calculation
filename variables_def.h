@@ -42,6 +42,9 @@ int NTIME;
 
 /** Define the name of the time dimension in the file. */
 string time_dimension;
+string x_dimension;
+string y_dimension;
+string z_dimension;
 
 /** Name of the Parfrac file */
 string parfrac_file;

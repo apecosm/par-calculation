@@ -44,6 +44,9 @@ extern int NTIME;
 
 /** Define the name of the time dimension in the file. */
 extern string time_dimension;
+extern string x_dimension;
+extern string y_dimension;
+extern string z_dimension;
 
 /** Name of the Parfrac file */
 extern string parfrac_file;

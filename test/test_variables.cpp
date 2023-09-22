@@ -19,11 +19,6 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (NFRAC !=  12) {
-        printf("Error reading NFRAC\n");
-        return 1;
-    }
-
     if (parfrac_var.compare("soshfldo") != 0) {
         printf("Error reading parfrac_var\n");
         return 1;

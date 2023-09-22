@@ -9,33 +9,20 @@
 #include "string_util.h"
 #include "variables.h"
 #include "par.h"
-
-/** Processors index to process. */
-ma1iu istart;
-ma1iu iend;
-ma1iu jstart;
-ma1iu jend;
-
-ma3f tmask;
-ma3f e3t_0;
-
 using namespace std;
 
-int mpiRank;
-int mpiSize;
-
 int main(int argc, char *argv[]) {
-    
+
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
     MPI_Comm_size(MPI_COMM_WORLD, &mpiSize);
-    
+
     if (mpiSize != LON_MPI * LAT_MPI) {
         printf("LON_MPI * LAT_MPI = %d, should be %d\n", LON_MPI * LAT_MPI, mpiSize);
         MPI_Finalize();
         exit(1);
     }
-    
+
     // Init the RGB attenuation coefficients
     init_zrgb();
 

@@ -2,6 +2,7 @@
 #include "boost_def.h"
 #include "string_util.h"
 #include "variables.h"
+#include "variables_def.h"
 #include <dirent.h>
 #include <mpi.h>
 #include <netcdf.h>
@@ -10,6 +11,12 @@
 #endif
 #include <regex>
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <boost/algorithm/string.hpp>
+
+using namespace std;
 
 #define ERRCODE 2
 #define ERR(e)                                 \
@@ -458,3 +465,35 @@ void read_parfrac(ma3f &var, const char *filename, const char *varname) {
         printf("%s: reading %s, step=[0, %d]\n", varname, filename, NFRAC - 1);
 }
 #endif
+
+void read_parameters(string filename) {
+
+    std::regex regexp_line("[^a-zA-Z.*=.*$");
+
+    string line, word;
+    vector<string> row;
+    fstream file(filename, ios::in);
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            row.clear();
+            if (!regex_match(line, regexp_line)) {
+                continue;
+            }
+
+            stringstream str(line);
+
+            while (getline(str, word, '=')) {
+                row.push_back(word);
+            }
+            string key = row[0];
+            string value = row[1];
+            boost::trim_right(key);
+            boost::trim_left(key);
+            boost::trim_right(value);
+            boost::trim_left(value);
+            parameters[key] = value;
+        }
+    } else {
+        cout << "Could not open the file\n";
+    }
+}

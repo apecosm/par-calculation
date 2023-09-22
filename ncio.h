@@ -11,4 +11,6 @@ size_t get_ntime_file(const char *filename);
 void define_output_file(int cpt);
 void write_step(int cpt, int step, ma3f var, int time);
 
+void read_parameters(std::string filename);
+
 #endif

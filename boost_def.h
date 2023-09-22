@@ -1,7 +1,7 @@
-/** 
+/**
  * \file OOPE_definitions.h
  * \author P.Verley
- * 
+ *
  * \brief Defines some types, the main variables and declares main functions of the
  * program.
  *

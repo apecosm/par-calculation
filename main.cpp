@@ -13,6 +13,8 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
+    string filename = argv[1];
+
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
     MPI_Comm_size(MPI_COMM_WORLD, &mpiSize);
@@ -31,10 +33,19 @@ int main(int argc, char *argv[]) {
     init_zrgb();
 
     vector<string> list_chl_files = get_files(chl_pattern);
+    NTIME = get_total_ntime(list_chl_files);
+
     vector<string> list_qsr_files = get_files(qsr_pattern);
+    if(NTIME != get_total_ntime(list_qsr_files)) {
+        printf("Different number of time steps between chl and qsr");
+    }
+
     vector<string> list_e3t_files;
     if (use_vvl) {
         list_e3t_files = get_files(e3t_pattern);
+        if (NTIME != get_total_ntime(list_e3t_files)) {
+            printf("Different number of time steps between chl and e3t");
+        }
     }
 
     // count the number of read for the given file
@@ -123,9 +134,9 @@ int main(int argc, char *argv[]) {
 
         read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr);
         read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl, conversion_chl);
-#ifdef VVL
-        read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
-#endif
+        if (use_vvl) {
+            read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
+        }
 
         int ifrac = time % NFRAC;
         if(mpiRank == 0) printf("ifrac = %d\n", ifrac);
@@ -153,9 +164,9 @@ int main(int argc, char *argv[]) {
 
         stepchl++;
         stepqsr++;
-#ifdef VVL
-        stepe3t++;
-#endif
+        if (use_vvl) {
+            stepe3t++;
+        }
     }
 
     // read the model mesh_mask

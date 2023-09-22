@@ -550,7 +550,6 @@ void set_parameters() {
     x_dimension = parameters["x_dimension"];
     y_dimension = parameters["y_dimension"];
     z_dimension = parameters["z_dimension"];
-    NTIME = stoi(parameters["NTIME"]);
 
     // define name of time dimension
     time_dimension = parameters["time_dimension"];

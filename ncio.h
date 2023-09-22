@@ -14,6 +14,7 @@ size_t get_ntime_file(string filename);
 size_t get_total_ntime(vector<string> filelist);
 void define_output_file(int cpt);
 void write_step(int cpt, int step, ma3f var, int time);
+size_t get_spatial_dimension_file(string filename, string dimname);
 
 void read_parameters(string filename);
 void set_parameters();

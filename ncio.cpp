@@ -526,16 +526,18 @@ void set_parameters() {
     if((parameters.find("e3t_pattern") == parameters.end()) || (parameters.find("e3t_var") == parameters.end())) {
         use_vvl = false;
     } else {
+        use_vvl = true;
         e3t_pattern = parameters["e3t_pattern"];
         e3t_var = parameters["e3t_var"];
     }
 
-        // Check if VVL is defined.
-    if((parameters.find("e3t_pattern") == parameters.end()) || (parameters.find("e3t_var") == parameters.end())) {
-        use_vvl = false;
+    // Check if variable par file is defined.
+    if((parameters.find("parfrac_file") == parameters.end()) || (parameters.find("parfrac_var") == parameters.end())) {
+        use_parfrac = false;
     } else {
-        e3t_pattern = parameters["e3t_pattern"];
-        e3t_var = parameters["e3t_var"];
+        use_parfrac = true;
+        parfrac_file = parameters["parfrac_file"];
+        parfrac_var = parameters["parfrac_var"];
     }
 
 }

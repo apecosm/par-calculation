@@ -106,8 +106,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Reading variable for e3t
-    read_gridvar(e3t, mesh_mask, "e3t_0");
     read_gridvar(tmask, mesh_mask, "tmask");
+    read_gridvar(e3t, mesh_mask, "e3t_0");
 
     if (mpiRank == 0)
         printf("+++++++++++++++++++++++++++++++ Starting computations\n");

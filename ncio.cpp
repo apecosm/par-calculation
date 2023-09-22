@@ -33,6 +33,10 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
     int status;
     int ncid;
     int varid;
+    nc_type rh_type;
+    int rh_ndims;
+    int rh_natts;
+    int rh_dimids[NC_MAX_VAR_DIMS];
 
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
@@ -57,8 +61,36 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
         ERR(status);
     }
 
-    size_t start[] = {0, get_jstart(mpiRank), get_istart(mpiRank)};
-    size_t count[] = {NZ, ny, nx};
+    int jjj = get_jstart(mpiRank);
+    int iii = get_istart(mpiRank);
+
+    status = nc_inq_var(ncid, varid, 0, &rh_type, &rh_ndims, rh_dimids, &rh_natts);
+    /* Get the varid of the data variable, based on its name. */
+    if (status != NC_NOERR) {
+        printf("Error reading variable informations\n");
+        ERR(status);
+    }
+
+    size_t start[rh_ndims];
+    size_t count[rh_ndims];
+
+    if (rh_ndims == 4) {
+        start[0] = 0;
+        start[1] = 0;
+        start[2] = get_jstart(mpiRank);
+        start[3] = get_istart(mpiRank);
+        count[0] = 1;
+        count[1] = NZ;
+        count[2] = ny;
+        count[3] = nx;
+    } else {
+        start[0] = 0;
+        start[1] = get_jstart(mpiRank);
+        start[2] = get_istart(mpiRank);
+        count[0] = NZ;
+        count[1] = ny;
+        count[2] = nx;
+    }
 
     status = nc_get_vara_float(ncid, varid, start, count, var.data());
     if (status != NC_NOERR) {
@@ -74,7 +106,7 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
 
     if (mpiRank == 0)
         printf("%s: reading %s\n", varname.c_str(), filename.c_str());
-}
+    }
 
 /** Get the number of time steps stored in a NetCDF output file
  *

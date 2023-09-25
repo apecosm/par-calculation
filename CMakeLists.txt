@@ -78,7 +78,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 set(RUNNING_TESTS true CACHE BOOL "True if tests should be running")
 set(BUILD_MODE "debug" CACHE STRING "Build mode (debug, release)")
-set(BOOST_ASSERT false CACHE BOOL "True if Boost assert is on. Default is False")
+set(BOOST_ASSERT true CACHE BOOL "True if Boost assert is on. Default is False")
 set(USE_PARALLEL_NETCDF false CACHE BOOL "True if the Parallel Netcdf should be used. Default is False")
 
 # If MPI is activated, then we look for the value of MPI

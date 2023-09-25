@@ -331,7 +331,7 @@ void define_output_file(int cpt) {
     int ny = NY;
     int nz = NZ;
 #else
-    sprintf(ncfile, "%s_%.05d.nc.%3d", output_prefix.c_str(), cpt, mpiRank);
+    sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
     int nx = get_nx(mpiRank);
     int ny = get_ny(mpiRank);
     int nz = NZ;
@@ -411,7 +411,12 @@ void write_step(int cpt, int step, ma3f var, int time) {
     int ncid, varid, status;
 
     char ncfile[1096];
-    sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
+
+#ifdef PAR_NETCDF
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
+#else
+    sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
+#endif
 
     size_t nx = get_nx(mpiRank);
     size_t ny = get_ny(mpiRank);

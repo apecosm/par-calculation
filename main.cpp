@@ -86,6 +86,7 @@ int main(int argc, char *argv[]) {
 
     // Init. the input arrays
     ma3f tmask(boost::extents[NZ][ny][nx]);
+    ma2f tmaskutil(boost::extents[ny][nx]);
     ma3f e3t(boost::extents[NZ][ny][nx]);
     ma3f chl(boost::extents[NZ][ny][nx]);
     ma2f qsr(boost::extents[ny][nx]);
@@ -109,9 +110,20 @@ int main(int argc, char *argv[]) {
     // Reading variable for e3t
     read_gridvar(tmask, mesh_mask, "tmask");
     read_gridvar(e3t, mesh_mask, "e3t_0");
+    if (check_variable_existence(mesh_mask, "tmaskutil")) {
+        read_gridvar(tmaskutil, mesh_mask, "tmaskutil");
+        for (int k = 0; k < NZ; k++) {
+            for (int j = 0; j < ny; j++) {
+                for (int i = 0; i < nx; i++) {
+                    tmask[k][j][i] *= tmaskutil[j][i];
+                }
+            }
+        }
+    }
 
-    if (mpiRank == 0)
+    if (mpiRank == 0) {
         printf("+++++++++++++++++++++++++++++++ Starting computations\n");
+    }
 
     for (int time = 0; time < NTIME; time++) {
 

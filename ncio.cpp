@@ -582,9 +582,9 @@ void read_parameters(string filename) {
 void set_parameters() {
 
     // Definition the spatial variables
-    LON_MPI = stoi(parameters["lon_mpi"]);
+    lon_mpi = stoi(parameters["lon_mpi"]);
 
-    LAT_MPI = stoi(parameters["lat_mpi"]);
+    lat_mpi = stoi(parameters["lat_mpi"]);
     x_dimension = parameters["x_dimension"];
     y_dimension = parameters["y_dimension"];
     z_dimension = parameters["z_dimension"];

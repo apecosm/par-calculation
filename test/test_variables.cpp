@@ -44,11 +44,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if (LON_MPI != 3) {
+    if (lon_mpi != 3) {
         printf("Error reading LON_MPI\n");
     }
 
-    if (LAT_MPI != 2) {
+    if (lat_mpi != 2) {
         printf("Error reading LAT_MPI\n");
     }
 

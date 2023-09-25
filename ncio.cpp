@@ -569,6 +569,7 @@ void read_parameters(string filename) {
             string value = row[1];
             boost::trim_right(key);
             boost::trim_left(key);
+            boost::to_lower(key);
             boost::trim_right(value);
             boost::trim_left(value);
             parameters[key] = value;
@@ -581,9 +582,9 @@ void read_parameters(string filename) {
 void set_parameters() {
 
     // Definition the spatial variables
-    LON_MPI = stoi(parameters["LON_MPI"]);
+    LON_MPI = stoi(parameters["lon_mpi"]);
 
-    LAT_MPI = stoi(parameters["LAT_MPI"]);
+    LAT_MPI = stoi(parameters["lat_mpi"]);
     x_dimension = parameters["x_dimension"];
     y_dimension = parameters["y_dimension"];
     z_dimension = parameters["z_dimension"];

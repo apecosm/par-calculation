@@ -214,9 +214,9 @@ void read_var(ma3f &var, const std::string filename, const std::string varname, 
     size_t nx = get_nx(mpiRank);
 
 #ifdef PAR_NETCDF
-    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading file %s\n", filename);
+        printf("Error reading file %s\n", filename.c_str());
         ERR(status);
     }
 #else
@@ -326,7 +326,7 @@ void define_output_file(int cpt) {
     int yd, xd, zd;
 
 #ifdef PAR_NETCDF
-    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
     int nx = NX;
     int ny = NY;
     int nz = NZ;
@@ -413,7 +413,7 @@ void write_step(int cpt, int step, ma3f var, int time) {
     char ncfile[1096];
 
 #ifdef PAR_NETCDF
-    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
 #else
     sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
 #endif
@@ -454,7 +454,7 @@ void write_step(int cpt, int step, ma3f var, int time) {
 #ifdef PAR_NETCDF
     status = nc_var_par_access(ncid, varid, NC_COLLECTIVE);
     if (status != NC_NOERR) {
-        printf("Error setting var access variable %s\n", output_var);
+        printf("Error setting var access variable %s\n", output_var.c_str());
         ERR(status);
     }
 #endif

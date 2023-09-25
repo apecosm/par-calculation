@@ -387,8 +387,9 @@ void read_var(ma2f &var, const std::string filename, const std::string varname, 
     int ncid;
     int varid;
 
-    if (mpiRank == 0)
+    if (mpiRank == 0) {
         printf("%s: reading %s, step=%ld\n", varname.c_str(), filename.c_str(), i0);
+    }
 
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
@@ -451,7 +452,11 @@ void define_output_file(int cpt) {
     int ny = NY;
     int nz = NZ;
 #else
-    sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
+    if (mpiSize == 1) {
+        sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
+    } else {
+        sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
+    }
     int nx = get_nx(mpiRank);
     int ny = get_ny(mpiRank);
     int nz = NZ;
@@ -504,6 +509,13 @@ void define_output_file(int cpt) {
         ERR(status);
     }
 
+    float fill_value = FILL_VALUE;
+    status = nc_put_att_float(ncid, varid, "_FillValue", NC_FLOAT, 1, &fill_value);
+    if (status != NC_NOERR) {
+        printf("Error defining fill value attribute %s\n", output_var.c_str());
+        ERR(status);
+    }
+
     int time_ids[] = {timeid};
     int tid;
 
@@ -535,7 +547,11 @@ void write_step(int cpt, int step, ma3f var, int time) {
 #ifdef PAR_NETCDF
     sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
 #else
-    sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
+    if (mpiSize == 1) {
+        sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
+    } else {
+        sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
+    }
 #endif
 
     size_t nx = get_nx(mpiRank);

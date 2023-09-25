@@ -97,4 +97,6 @@ extern std::map<std::string, std::string> parameters;
 #define get_nx(p) (get_iend(p) - get_istart(p) + 1)
 #define get_ny(p) (get_jend(p) - get_jstart(p) + 1)
 
+#define FILL_VALUE -9999
+
 #endif

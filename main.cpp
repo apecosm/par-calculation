@@ -90,14 +90,15 @@ int main(int argc, char *argv[]) {
     ma3f chl(boost::extents[NZ][ny][nx]);
     ma2f qsr(boost::extents[ny][nx]);
     ma3f par(boost::extents[NZ][ny][nx]);
-    ma3f parfrac(boost::extents[NZ][ny][nx]);
+    ma3f parfrac;
     if (use_parfrac) {
         NFRAC = get_ntime_file(parfrac_file);
+        parfrac.resize(boost::extents[NFRAC][ny][nx]);
         read_parfrac(parfrac, parfrac_file, parfrac_var);
     } else {
         NFRAC = 1;
         float const_parfrac = stof(parameters["constant_parfrac"]);
-        ma3f parfrac(boost::extents[NFRAC][ny][nx]);
+        parfrac.resize(boost::extents[NFRAC][ny][nx]);
         for(size_t j=0; j<ny;j++) {
             for(size_t i=0; i<nx;i++) {
                 parfrac[0][j][i] = const_parfrac;

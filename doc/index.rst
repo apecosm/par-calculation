@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to 3D PAR reconstruction's documentation!
+3D PAR reconstruction's documentation!
 =================================================
 
 .. toctree::
@@ -11,6 +11,8 @@ Welcome to 3D PAR reconstruction's documentation!
    :caption: Contents:
 
    intro.rst
+   compilation.rst
+   biblio.rst
 
 
 

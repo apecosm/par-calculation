@@ -12,6 +12,7 @@
 
    intro.rst
    compilation.rst
+   running.rst
    biblio.rst
 
 

@@ -66,6 +66,7 @@ extern string chl_pattern;
 extern string chl_var;
 /** Conversion factor to convert Chl in mg/m3 */
 extern double conversion_chl;
+extern double conversion_qsr;
 
 /** Pattern of the Chl files to read */
 extern string qsr_pattern;

@@ -733,10 +733,19 @@ void set_parameters() {
     // define pattern
     chl_pattern = parameters["chl_pattern"];
     chl_var = parameters["chl_var"];
-    conversion_chl = stof(parameters["conversion_chl"]);
+    if (parameters.find("conversion_chl") == parameters.end()) {
+        conversion_chl = stof(parameters["conversion_chl"]);
+    } else {
+        conversion_chl = 1.0;
+    }
 
     qsr_pattern = parameters["qsr_pattern"];
     qsr_var = parameters["qsr_var"];
+    if (parameters.find("conversion_qsr") == parameters.end()) {
+        conversion_qsr = stof(parameters["conversion_qsr"]);
+    } else {
+        conversion_qsr = 1.0;
+    }
 
     output_prefix = parameters["output_prefix"];
     output_var = parameters["output_var"];

@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
 
         if(mpiRank == 0) printf("++++++ time = %d\n", time);
 
-        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr);
+        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr, conversion_qsr);
         read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl, conversion_chl);
         if (use_vvl) {
             read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);

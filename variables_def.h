@@ -64,6 +64,7 @@ string chl_pattern;
 string chl_var;
 /** Conversion factor to convert Chl in mg/m3 */
 double conversion_chl;
+double conversion_qsr;
 
 /** Pattern of the Chl files to read */
 string qsr_pattern;

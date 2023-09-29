@@ -14,3 +14,4 @@ test/resources/correct_ptrc_T.ipynb
 test/resources/HOTv420_1ts_20100101_20101231_grid_T.nc
 test/resources/HOTv420_1ts_20100101_20101231_ptrc_T.nc
 **.ipynb_checkpoints
+doc/_build

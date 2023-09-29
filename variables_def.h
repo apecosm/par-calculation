@@ -22,10 +22,10 @@ int mpiSize;
 // Define external variables for storing variables
 
 /** Number of tiles along X */
-int LON_MPI;
+int lon_mpi;
 
 /** Number of tiles along Y */
-int LAT_MPI;
+int lat_mpi;
 
 /** Number of points along X */
 size_t NX;

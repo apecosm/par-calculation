@@ -22,8 +22,8 @@ int main(int argc, char *argv[]) {
     read_parameters(filename);
     set_parameters();
 
-    if (mpiSize != LON_MPI * LAT_MPI) {
-        printf("LON_MPI * LAT_MPI = %d, should be %d\n", LON_MPI * LAT_MPI, mpiSize);
+    if (mpiSize != lon_mpi * lat_mpi) {
+        printf("LON_MPI * LAT_MPI = %d, should be %d\n", lon_mpi * lat_mpi, mpiSize);
         MPI_Finalize();
         exit(1);
     }
@@ -86,18 +86,20 @@ int main(int argc, char *argv[]) {
 
     // Init. the input arrays
     ma3f tmask(boost::extents[NZ][ny][nx]);
+    ma2f tmaskutil(boost::extents[ny][nx]);
     ma3f e3t(boost::extents[NZ][ny][nx]);
     ma3f chl(boost::extents[NZ][ny][nx]);
     ma2f qsr(boost::extents[ny][nx]);
     ma3f par(boost::extents[NZ][ny][nx]);
-    ma3f parfrac(boost::extents[NZ][ny][nx]);
+    ma3f parfrac;
     if (use_parfrac) {
         NFRAC = get_ntime_file(parfrac_file);
+        parfrac.resize(boost::extents[NFRAC][ny][nx]);
         read_parfrac(parfrac, parfrac_file, parfrac_var);
     } else {
         NFRAC = 1;
         float const_parfrac = stof(parameters["constant_parfrac"]);
-        ma3f parfrac(boost::extents[NFRAC][ny][nx]);
+        parfrac.resize(boost::extents[NFRAC][ny][nx]);
         for(size_t j=0; j<ny;j++) {
             for(size_t i=0; i<nx;i++) {
                 parfrac[0][j][i] = const_parfrac;
@@ -108,9 +110,20 @@ int main(int argc, char *argv[]) {
     // Reading variable for e3t
     read_gridvar(tmask, mesh_mask, "tmask");
     read_gridvar(e3t, mesh_mask, "e3t_0");
+    if (check_variable_existence(mesh_mask, "tmaskutil")) {
+        read_gridvar(tmaskutil, mesh_mask, "tmaskutil");
+        for (int k = 0; k < NZ; k++) {
+            for (int j = 0; j < ny; j++) {
+                for (int i = 0; i < nx; i++) {
+                    tmask[k][j][i] *= tmaskutil[j][i];
+                }
+            }
+        }
+    }
 
-    if (mpiRank == 0)
+    if (mpiRank == 0) {
         printf("+++++++++++++++++++++++++++++++ Starting computations\n");
+    }
 
     for (int time = 0; time < NTIME; time++) {
 
@@ -179,32 +192,32 @@ int main(int argc, char *argv[]) {
 
 void init_mpi_domains(void) {
 
-    istart.resize(boost::extents[LON_MPI]);
-    iend.resize(boost::extents[LON_MPI]);
-    jstart.resize(boost::extents[LAT_MPI]);
-    jend.resize(boost::extents[LAT_MPI]);
+    istart.resize(boost::extents[lon_mpi]);
+    iend.resize(boost::extents[lon_mpi]);
+    jstart.resize(boost::extents[lat_mpi]);
+    jend.resize(boost::extents[lat_mpi]);
 
-    int ncellx = NX / LON_MPI;
-    int ncelly = NY / LAT_MPI;
+    int ncellx = NX / lon_mpi;
+    int ncelly = NY / lat_mpi;
 
     // init the MPI layers in longitude
     istart[0] = 0;
-    iend[LON_MPI - 1] = NX - 1;
-    for (int i = 0; i < LON_MPI - 1; i++) {
+    iend[lon_mpi - 1] = NX - 1;
+    for (int i = 0; i < lon_mpi - 1; i++) {
         iend[i] = ncellx * (1 + i) - 1;
         istart[i + 1] = iend[i] + 1;
     }
 
     jstart[0] = 0;
-    jend[LAT_MPI - 1] = NY - 1;
-    for (int i = 0; i < LAT_MPI - 1; i++) {
+    jend[lat_mpi - 1] = NY - 1;
+    for (int i = 0; i < lat_mpi - 1; i++) {
         jend[i] = ncelly * (1 + i) - 1;
         jstart[i + 1] = jend[i] + 1;
     }
 
     if (mpiRank == 0) {
         printf("++++++++++++++++++++++++ Init MPI decomposition\n");
-        for (int i = 0; i < LON_MPI * LAT_MPI; i++) {
+        for (int i = 0; i < lon_mpi * lat_mpi; i++) {
             printf("++++ i=%d, istart=%ld, iend=%ld, jstart=%ld, jend=%ld\n", i, get_istart(i), get_iend(i), get_jstart(i), get_jend(i));
         }
     }

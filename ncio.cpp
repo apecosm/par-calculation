@@ -25,6 +25,41 @@ using namespace std;
         exit(ERRCODE);                         \
     }
 
+bool check_variable_existence(string filename, string varname) {
+
+    int status;
+    int ncid;
+    int varid;
+    nc_type rh_type;
+    int rh_ndims;
+    int rh_natts;
+    int rh_dimids[NC_MAX_VAR_DIMS];
+
+    size_t ny = get_ny(mpiRank);
+    size_t nx = get_nx(mpiRank);
+
+#ifdef PAR_NETCDF
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error opening %s\n", filename.c_str());
+        ERR(status);
+    }
+#else
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error opening %s\n", filename.c_str());
+        ERR(status);
+    }
+#endif
+
+    status = nc_inq_varid(ncid, varname.c_str(), &varid);
+    if (status != NC_NOERR) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
 /** Reads a 2D (y, x) output variable.
  *
 */
@@ -75,6 +110,7 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
     size_t count[rh_ndims];
 
     if (rh_ndims == 4) {
+        // dimensions is time, z, lat, lon
         start[0] = 0;
         start[1] = 0;
         start[2] = get_jstart(mpiRank);
@@ -84,6 +120,7 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
         count[2] = ny;
         count[3] = nx;
     } else {
+        // dimensions is z, lat, lon
         start[0] = 0;
         start[1] = get_jstart(mpiRank);
         start[2] = get_istart(mpiRank);
@@ -104,9 +141,92 @@ void read_gridvar(ma3f &var, const std::string filename, const std::string varna
         ERR(status);
     }
 
-    if (mpiRank == 0)
+    if (mpiRank == 0) {
         printf("%s: reading %s\n", varname.c_str(), filename.c_str());
     }
+}
+
+/** Reads a 2D (y, x) output variable.
+ *
+*/
+void read_gridvar(ma2f &var, const std::string filename, const std::string varname) {
+
+    int status;
+    int ncid;
+    int varid;
+    nc_type rh_type;
+    int rh_ndims;
+    int rh_natts;
+    int rh_dimids[NC_MAX_VAR_DIMS];
+
+    size_t ny = get_ny(mpiRank);
+    size_t nx = get_nx(mpiRank);
+
+#ifdef PAR_NETCDF
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error opening %s\n", filename.c_str());
+        ERR(status);
+    }
+#else
+    status = nc_open(filename.c_str(), NC_NOWRITE, &ncid);
+    if (status != NC_NOERR) {
+        printf("Error opening %s\n", filename.c_str());
+        ERR(status);
+    }
+#endif
+
+    status = nc_inq_varid(ncid, varname.c_str(), &varid);
+    if (status != NC_NOERR) {
+        printf("Error inq %s\n", varname.c_str());
+        ERR(status);
+    }
+
+    int jjj = get_jstart(mpiRank);
+    int iii = get_istart(mpiRank);
+
+    status = nc_inq_var(ncid, varid, 0, &rh_type, &rh_ndims, rh_dimids, &rh_natts);
+    /* Get the varid of the data variable, based on its name. */
+    if (status != NC_NOERR) {
+        printf("Error reading variable informations\n");
+        ERR(status);
+    }
+
+    size_t start[rh_ndims];
+    size_t count[rh_ndims];
+
+    if (rh_ndims == 3) {
+        // dimension is time, lat, lon
+        start[0] = 0;
+        start[1] = get_jstart(mpiRank);
+        start[2] = get_istart(mpiRank);
+        count[0] = 1;
+        count[1] = ny;
+        count[2] = nx;
+    } else {
+        // dimension is lat, lon
+        start[0] = get_jstart(mpiRank);
+        start[1] = get_istart(mpiRank);
+        count[0] = ny;
+        count[1] = nx;
+    }
+
+    status = nc_get_vara_float(ncid, varid, start, count, var.data());
+    if (status != NC_NOERR) {
+        printf("Error reading %s\n", varname.c_str());
+        ERR(status);
+    }
+
+    status = nc_close(ncid);
+    if (status != NC_NOERR) {
+        printf("Error closing %s\n", filename.c_str());
+        ERR(status);
+    }
+
+    if (mpiRank == 0) {
+        printf("%s: reading %s\n", varname.c_str(), filename.c_str());
+    }
+}
 
 /** Get the number of time steps stored in a NetCDF output file
  *
@@ -214,9 +334,9 @@ void read_var(ma3f &var, const std::string filename, const std::string varname, 
     size_t nx = get_nx(mpiRank);
 
 #ifdef PAR_NETCDF
-    status = nc_open_par(filename, NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
+    status = nc_open_par(filename.c_str(), NC_NOWRITE | NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
     if (status != NC_NOERR) {
-        printf("Error reading file %s\n", filename);
+        printf("Error reading file %s\n", filename.c_str());
         ERR(status);
     }
 #else
@@ -267,8 +387,9 @@ void read_var(ma2f &var, const std::string filename, const std::string varname, 
     int ncid;
     int varid;
 
-    if (mpiRank == 0)
+    if (mpiRank == 0) {
         printf("%s: reading %s, step=%ld\n", varname.c_str(), filename.c_str(), i0);
+    }
 
     size_t ny = get_ny(mpiRank);
     size_t nx = get_nx(mpiRank);
@@ -326,12 +447,16 @@ void define_output_file(int cpt) {
     int yd, xd, zd;
 
 #ifdef PAR_NETCDF
-    sprintf(ncfile, "%s_%.05d.nc", output_prefix, cpt);
+    sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
     int nx = NX;
     int ny = NY;
     int nz = NZ;
 #else
-    sprintf(ncfile, "%s_%.05d.nc.%3d", output_prefix.c_str(), cpt, mpiRank);
+    if (mpiSize == 1) {
+        sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
+    } else {
+        sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
+    }
     int nx = get_nx(mpiRank);
     int ny = get_ny(mpiRank);
     int nz = NZ;
@@ -384,6 +509,13 @@ void define_output_file(int cpt) {
         ERR(status);
     }
 
+    float fill_value = FILL_VALUE;
+    status = nc_put_att_float(ncid, varid, "_FillValue", NC_FLOAT, 1, &fill_value);
+    if (status != NC_NOERR) {
+        printf("Error defining fill value attribute %s\n", output_var.c_str());
+        ERR(status);
+    }
+
     int time_ids[] = {timeid};
     int tid;
 
@@ -411,7 +543,16 @@ void write_step(int cpt, int step, ma3f var, int time) {
     int ncid, varid, status;
 
     char ncfile[1096];
+
+#ifdef PAR_NETCDF
     sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
+#else
+    if (mpiSize == 1) {
+        sprintf(ncfile, "%s_%.05d.nc", output_prefix.c_str(), cpt);
+    } else {
+        sprintf(ncfile, "%s_%.05d.nc.%.3d", output_prefix.c_str(), cpt, mpiRank);
+    }
+#endif
 
     size_t nx = get_nx(mpiRank);
     size_t ny = get_ny(mpiRank);
@@ -449,7 +590,7 @@ void write_step(int cpt, int step, ma3f var, int time) {
 #ifdef PAR_NETCDF
     status = nc_var_par_access(ncid, varid, NC_COLLECTIVE);
     if (status != NC_NOERR) {
-        printf("Error setting var access variable %s\n", output_var);
+        printf("Error setting var access variable %s\n", output_var.c_str());
         ERR(status);
     }
 #endif
@@ -564,6 +705,7 @@ void read_parameters(string filename) {
             string value = row[1];
             boost::trim_right(key);
             boost::trim_left(key);
+            boost::to_lower(key);
             boost::trim_right(value);
             boost::trim_left(value);
             parameters[key] = value;
@@ -576,9 +718,9 @@ void read_parameters(string filename) {
 void set_parameters() {
 
     // Definition the spatial variables
-    LON_MPI = stoi(parameters["LON_MPI"]);
+    lon_mpi = stoi(parameters["lon_mpi"]);
 
-    LAT_MPI = stoi(parameters["LAT_MPI"]);
+    lat_mpi = stoi(parameters["lat_mpi"]);
     x_dimension = parameters["x_dimension"];
     y_dimension = parameters["y_dimension"];
     z_dimension = parameters["z_dimension"];

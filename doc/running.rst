@@ -53,6 +53,49 @@ the following parameters:
     Chlorophyll must be in :math:`gChl.m^{-3}` and solar radiation in
     :math:`W.m^{-2}`
 
+If the user provides the following parameters:
 
+.. list-table:: Configuration options: par fraction file
+    :header-rows: 1
 
-constant_parfrac = 0.43
+    * - Option
+      - Description
+    * - ``parfrac_file``
+      - Localisation of PAR fraction file
+    * - ``parfrac_var``
+      - Name of the PAR fraction variable
+
+then the program assumes that the fraction of qsr that will
+be used in the light attenuation algorithm varies over time and
+space.
+
+If one of the above argument is missing, then a constant par fraction
+will be applied. It is provided by the following
+parameter:
+
+.. list-table:: Configuration options: par fraction file
+    :header-rows: 1
+
+    * - Option
+      - Description
+    * - ``constant_parfrac``
+      - Fraction of the qsr fraction used in the PAR par calculation
+
+If the user provides the following parameters:
+
+.. list-table:: Configuration options: VVL
+    :header-rows: 1
+
+    * - Option
+      - Description
+    * - ``e3t_pattern``
+      - Regular expression to list the cell thickness files.
+    * - ``e3t_var``
+      - Name of the cell thickness variable
+
+the program assumes that the cell thickness vary over time and space.
+It will read the cell thickness variables and use it in the PAR
+vertical attenuation.
+
+If one of the above variable is missing, then the cell thickness is
+read from the mesh mask.

@@ -1,0 +1,15 @@
+{% extends "!layout.html" %}
+
+{% block sidebartitle %}
+
+      <p>3D PAR reconstruction</p>
+	  <a href="https://github.com/apecosm/">
+		  <img src="{{ pathto('_static/cropped-logo_apecosm_sanstexte_rvb_300dpi-2.png', 1) }}" class="logo" alt="Logo"/>
+	  </a>
+	  <p> Click on APECOSM logo to visit the APECOSM GitHub page </p>
+
+	<div class="version">{{ version }}</div>
+
+	{% include "searchbox.html" %}
+
+{% endblock %}

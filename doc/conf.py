@@ -30,7 +30,8 @@ numfig_secnum_depth = (1)
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 # html_theme = 'alabaster'
-# html_static_path = ['_static']
+html_static_path = ['_static']
+html_logo = '_static/cropped-logo_apecosm_sanstexte_rvb_300dpi-2.png'
 
 import sphinx_rtd_theme
 html_theme = "sphinx_rtd_theme"

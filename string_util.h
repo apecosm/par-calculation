@@ -5,6 +5,6 @@
 
 std::string getFileName(std::string filePath);
 std::string getDirName(std::string filePath);
-std::vector<std::string> get_files(const char *file_prefix);
+std::vector<std::string> get_files(const std::string file_prefix);
 
 #endif

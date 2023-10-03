@@ -1,5 +1,5 @@
 {
-    
+
     "search.exclude": {
         "arch": true,
         "bin": true,
@@ -7,7 +7,7 @@
         "lib": true,
         "report": true,
     },
-    
+
     "files.exclude": {
         "*sh": true,
         "*Makefile*": true,
@@ -28,5 +28,7 @@
         "__config": "cpp",
         "cstdio": "cpp"
     },
-    "C_Cpp.clang_format_style": " { BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All }"
+    "C_Cpp.clang_format_style": " { BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, AllowShortIfStatementsOnASingleLine: false, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All }",
+    "esbonio.sphinx.confDir": "${workspaceFolder}/doc",
+    "esbonio.sphinx.buildDir": "${confDir}/_build",
 }

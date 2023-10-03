@@ -9,41 +9,48 @@
 #include "string_util.h"
 #include "variables.h"
 #include "par.h"
-
-/** Processors index to process. */
-ma1iu istart;
-ma1iu iend;
-ma1iu jstart;
-ma1iu jend;
-
-ma3f tmask;
-ma3f e3t_0;
-
 using namespace std;
 
-int mpiRank;
-int mpiSize;
-
 int main(int argc, char *argv[]) {
-    
+
+    string filename = argv[1];
+
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &mpiRank);
     MPI_Comm_size(MPI_COMM_WORLD, &mpiSize);
-    
-    if (mpiSize != LON_MPI * LAT_MPI) {
-        printf("LON_MPI * LAT_MPI = %d, should be %d\n", LON_MPI * LAT_MPI, mpiSize);
+
+    read_parameters(filename);
+    set_parameters();
+
+    if (mpiSize != lon_mpi * lat_mpi) {
+        printf("LON_MPI * LAT_MPI = %d, should be %d\n", lon_mpi * lat_mpi, mpiSize);
         MPI_Finalize();
         exit(1);
     }
-    
+
+    NX = get_spatial_dimension_file(mesh_mask, x_dimension);
+    NY = get_spatial_dimension_file(mesh_mask, y_dimension);
+    NZ = get_spatial_dimension_file(mesh_mask, z_dimension);
+
     // Init the RGB attenuation coefficients
     init_zrgb();
 
     vector<string> list_chl_files = get_files(chl_pattern);
+    NTIME = get_total_ntime(list_chl_files);
+
     vector<string> list_qsr_files = get_files(qsr_pattern);
-#ifdef VVL
-    vector<string> list_e3t_files = get_files(e3t_pattern);
-#endif
+    size_t nqsr_tot = get_total_ntime(list_qsr_files);
+    if(NTIME != nqsr_tot) {
+        printf("Different number of time steps between chl (%d) and qsr (%ld)\n", NTIME, nqsr_tot);
+    }
+
+    vector<string> list_e3t_files;
+    if (use_vvl) {
+        list_e3t_files = get_files(e3t_pattern);
+        if (NTIME != get_total_ntime(list_e3t_files)) {
+            printf("Different number of time steps between chl and e3t");
+        }
+    }
 
     // count the number of read for the given file
     // ichl = index of the file in the list of files
@@ -57,11 +64,15 @@ int main(int argc, char *argv[]) {
     int iqsr = 0;
     size_t nqsr = get_ntime_file(list_qsr_files[iqsr].c_str());
 
-#ifdef VVL
-    size_t stepe3t = 0;
-    int ie3t = 0;
-    size_t ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
-#endif
+    size_t stepe3t;
+    int ie3t;
+    size_t ne3t;
+
+    if (use_vvl) {
+        stepe3t = 0;
+        ie3t = 0;
+        ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
+    }
 
     // iterator for the output
     int iout = 0;
@@ -75,21 +86,44 @@ int main(int argc, char *argv[]) {
 
     // Init. the input arrays
     ma3f tmask(boost::extents[NZ][ny][nx]);
+    ma2f tmaskutil(boost::extents[ny][nx]);
     ma3f e3t(boost::extents[NZ][ny][nx]);
     ma3f chl(boost::extents[NZ][ny][nx]);
     ma2f qsr(boost::extents[ny][nx]);
     ma3f par(boost::extents[NZ][ny][nx]);
-#ifdef PARFRAC
-    ma3f parfrac(boost::extents[NFRAC][ny][nx]);
-    read_parfrac(parfrac, parfrac_file, parfrac_var);
-#endif
+    ma3f parfrac;
+    if (use_parfrac) {
+        NFRAC = get_ntime_file(parfrac_file);
+        parfrac.resize(boost::extents[NFRAC][ny][nx]);
+        read_parfrac(parfrac, parfrac_file, parfrac_var);
+    } else {
+        NFRAC = 1;
+        float const_parfrac = stof(parameters["constant_parfrac"]);
+        parfrac.resize(boost::extents[NFRAC][ny][nx]);
+        for(size_t j=0; j<ny;j++) {
+            for(size_t i=0; i<nx;i++) {
+                parfrac[0][j][i] = const_parfrac;
+            }
+        }
+    }
 
     // Reading variable for e3t
-    read_gridvar(e3t, mesh_mask, "e3t_0");
     read_gridvar(tmask, mesh_mask, "tmask");
+    read_gridvar(e3t, mesh_mask, "e3t_0");
+    if (check_variable_existence(mesh_mask, "tmaskutil")) {
+        read_gridvar(tmaskutil, mesh_mask, "tmaskutil");
+        for (int k = 0; k < NZ; k++) {
+            for (int j = 0; j < ny; j++) {
+                for (int i = 0; i < nx; i++) {
+                    tmask[k][j][i] *= tmaskutil[j][i];
+                }
+            }
+        }
+    }
 
-    if (mpiRank == 0)
+    if (mpiRank == 0) {
         printf("+++++++++++++++++++++++++++++++ Starting computations\n");
+    }
 
     for (int time = 0; time < NTIME; time++) {
 
@@ -105,23 +139,22 @@ int main(int argc, char *argv[]) {
             nqsr = get_ntime_file(list_qsr_files[iqsr].c_str());
         }
 
-#ifdef VVL
-        if (stepe3t == ne3t) {
-            ie3t++;
-            stepe3t = 0;
-            ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
+        if (use_vvl) {
+            if (stepe3t == ne3t) {
+                ie3t++;
+                stepe3t = 0;
+                ne3t = get_ntime_file(list_e3t_files[ie3t].c_str());
+            }
         }
-#endif
 
         if(mpiRank == 0) printf("++++++ time = %d\n", time);
 
-        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr);
+        read_var(qsr, list_qsr_files[iqsr].c_str(), qsr_var, stepqsr, conversion_qsr);
         read_var(chl, list_chl_files[ichl].c_str(), chl_var, stepchl, conversion_chl);
-#ifdef VVL
-        read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
-#endif
+        if (use_vvl) {
+            read_var(e3t, list_e3t_files[ie3t].c_str(), e3t_var, stepe3t);
+        }
 
-#ifdef PARFRAC
         int ifrac = time % NFRAC;
         if(mpiRank == 0) printf("ifrac = %d\n", ifrac);
         for (int j = 0; j < ny; j++) {
@@ -130,7 +163,6 @@ int main(int argc, char *argv[]) {
                 qsr[j][i] *= parfrac[ifrac][j][i];
             }
         }
-#endif
 
         // computation of PAR.
         compute_par_c(par, chl, qsr, e3t, tmask);
@@ -149,9 +181,9 @@ int main(int argc, char *argv[]) {
 
         stepchl++;
         stepqsr++;
-#ifdef VVL
-        stepe3t++;
-#endif
+        if (use_vvl) {
+            stepe3t++;
+        }
     }
 
     // read the model mesh_mask
@@ -160,32 +192,32 @@ int main(int argc, char *argv[]) {
 
 void init_mpi_domains(void) {
 
-    istart.resize(boost::extents[LON_MPI]);
-    iend.resize(boost::extents[LON_MPI]);
-    jstart.resize(boost::extents[LAT_MPI]);
-    jend.resize(boost::extents[LAT_MPI]);
+    istart.resize(boost::extents[lon_mpi]);
+    iend.resize(boost::extents[lon_mpi]);
+    jstart.resize(boost::extents[lat_mpi]);
+    jend.resize(boost::extents[lat_mpi]);
 
-    int ncellx = NX / LON_MPI;
-    int ncelly = NY / LAT_MPI;
+    int ncellx = NX / lon_mpi;
+    int ncelly = NY / lat_mpi;
 
     // init the MPI layers in longitude
     istart[0] = 0;
-    iend[LON_MPI - 1] = NX - 1;
-    for (int i = 0; i < LON_MPI - 1; i++) {
+    iend[lon_mpi - 1] = NX - 1;
+    for (int i = 0; i < lon_mpi - 1; i++) {
         iend[i] = ncellx * (1 + i) - 1;
         istart[i + 1] = iend[i] + 1;
     }
 
     jstart[0] = 0;
-    jend[LAT_MPI - 1] = NY - 1;
-    for (int i = 0; i < LAT_MPI - 1; i++) {
+    jend[lat_mpi - 1] = NY - 1;
+    for (int i = 0; i < lat_mpi - 1; i++) {
         jend[i] = ncelly * (1 + i) - 1;
         jstart[i + 1] = jend[i] + 1;
     }
 
     if (mpiRank == 0) {
         printf("++++++++++++++++++++++++ Init MPI decomposition\n");
-        for (int i = 0; i < LON_MPI * LAT_MPI; i++) {
+        for (int i = 0; i < lon_mpi * lat_mpi; i++) {
             printf("++++ i=%d, istart=%ld, iend=%ld, jstart=%ld, jend=%ld\n", i, get_istart(i), get_iend(i), get_jstart(i), get_jend(i));
         }
     }

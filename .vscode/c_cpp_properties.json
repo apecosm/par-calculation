@@ -2,16 +2,8 @@
     "configurations": [
         {
             "name": "Linux",
-            "includePath": [
-                "${workspaceFolder}/**", 
-                "/home/barrier/Libs/Cpp/boost_1_70_0/",
-                "/usr/lib/x86_64-linux-gnu/openmpi/include",
-                "/home/barrier/Libs/Cpp/alglib-3.4/trunk/",
-                "/usr/lib/x86_64-linux-gnu/openmpi/include/"
-            ],
-            "cStandard": "c11",
-            "cppStandard": "c++11",
-            "intelliSenseMode": "clang-x64"
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],
     "version": 4

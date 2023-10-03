@@ -13,8 +13,8 @@ CC =  mpicxx  # cpp compilator
 AR = ar      # linker of .o into .a
 ARFLAGS = r  # ar flag
 RM = rm       # rm alias
-RMFLAGS = -fv   # rm options 
-LINKMAIN =  mpicxx   # main linker 
+RMFLAGS = -fv   # rm options
+LINKMAIN =  mpicxx   # main linker
 LINK =  mpicxx    # linker
 MKDIR = mkdir -p
 EXENAME = compute_par.exe
@@ -24,18 +24,18 @@ EXENAME = compute_par.exe
 ###################################################
 
 ### BOOST path
-BOOST = ${HOME}/Libs/Cpp/boost_1_70_0/
+BOOST = ${HOME}/Libs/Cpp/boost_1_78_0/
 INCBOOST = -I$(BOOST)
 
 ### Netcdf
-LIBNETCDF = -L/home/barrier/Libs/netcdf_par/netcdf-c-4.7.4/install/lib -lnetcdf -L/home/barrier/Libs/netcdf_par/hdf5-1.12.0/install/lib -lhdf5_hl -lhdf5 -lz
+LIBNETCDF = -L/usr/lib/x86_64-linux-gnu/lib -lnetcdf -L/usr/lib/x86_64-linux-gnu/hdf5/serial/ -lhdf5_hl -lhdf5 -lz
 
 # On Datarmor, when loading the proper NetCDF module, MPI path are automatically
 # set up (cf. quickstart, page 11).
-INCNETCDF = -I/home/barrier/Libs/netcdf_par/netcdf-c-4.7.4/install/include 
+INCNETCDF = -I/usr/lib/x86_64-linux-gnu/lib
 
 # Optimisation flags
-OPTFLAGS = -O3 -std=c++11
+OPTFLAGS = -O3 -std=c++17
 
 # Warning flags
 WFLAGS = -g

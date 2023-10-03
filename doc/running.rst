@@ -7,8 +7,18 @@ The tool can be run as follows:
 
     ./par_calculation configuration_file.conf
 
-The argument specifies the configuration file, which must contain
-the following parameters:
+The argument specifies the configuration file, which must be in the
+following format:
+
+.. code-block::
+
+  key = value
+
+Compulsory parameters
+---------------------------------
+
+In the following table, the parameters
+that **must** be defined are described.
 
 .. list-table:: Configuration options
     :header-rows: 1
@@ -53,6 +63,14 @@ the following parameters:
     Chlorophyll must be in :math:`gChl.m^{-3}` and solar radiation in
     :math:`W.m^{-2}`
 
+PAR fraction
+---------------------------------
+
+In NEMO, only a fraction of the solar radiation is used in the
+PAR calculation. This fraction is either constant or
+is provided in a NetCDF file. Both approach are
+included in the PAR reconstruction tool.
+
 If the user provides the following parameters:
 
 .. list-table:: Configuration options: par fraction file
@@ -67,7 +85,14 @@ If the user provides the following parameters:
 
 then the program assumes that the fraction of qsr that will
 be used in the light attenuation algorithm varies over time and
-space.
+space. It will read the par fraction in the file using the file
+location (``parfrac_file``) and the variable name (``parfrac_var``)
+
+.. danger::
+
+  The PAR fraction sampling must be identical to the one of the
+  other variables. If you are using monthly outputs, then you need
+  to provide a monthly par fraction.
 
 If one of the above argument is missing, then a constant par fraction
 will be applied. It is provided by the following
@@ -81,7 +106,18 @@ parameter:
     * - ``constant_parfrac``
       - Fraction of the qsr fraction used in the PAR par calculation
 
-If the user provides the following parameters:
+
+
+Varying vertical layers (VVL)
+---------------------------------
+
+The the most recent NEMO simulations, the cell
+thickness varies over time and space. Since the
+light attenuation depends on it, the par reconstruction
+tool allow to use the thickness outputs (usually
+``e3t`` or ``thkcello``) to reconstruct the PAR.
+
+To do so, the user must provided  the following parameters:
 
 .. list-table:: Configuration options: VVL
     :header-rows: 1
@@ -93,9 +129,5 @@ If the user provides the following parameters:
     * - ``e3t_var``
       - Name of the cell thickness variable
 
-the program assumes that the cell thickness vary over time and space.
-It will read the cell thickness variables and use it in the PAR
-vertical attenuation.
-
 If one of the above variable is missing, then the cell thickness is
-read from the mesh mask.
+read from the mesh mask (``e3t_0``) variable.
